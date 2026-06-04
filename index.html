@@ -36,9 +36,11 @@
 
         <main class="text-white p-3 p-md-4 flex-grow-1">
             <section>
-
+                <div class="explanation-text">
+                    <p>Este intérprete ejecuta el código paso a paso. Usa los botones para avanzar o reproducir
+                        automáticamente.</p>
+                </div>
                 <div class="workspace">
-
                     <!--Panel editor de código -->
                     <div class="console-panel editor-panel">
                         <div class="console-header">
@@ -62,9 +64,9 @@
                     <div class="side-panels">
 
                         <!-- Panel 1 -->
-                        <div class="console-panel">
-                            <div class="console-header">
-                                <span class="console-title">Paso actual</span>
+                        <div class="console-panel2">
+                            <div class="console-header2">
+                                <span class="console-title2">Paso actual</span>
                             </div>
                             <div class="console-body">
                             </div>
@@ -73,9 +75,7 @@
                         <!-- Panel 2 -->
                         <div class="console-panel">
                             <div class="console-header">
-                                <span class="console-icon">{ }</span>
                                 <span class="console-title">Variables</span>
-                                <span class="console-badge">estado actual</span>
                             </div>
                             <div class="console-body">
                             </div>
@@ -84,8 +84,7 @@
                         <!-- Panel 3 -->
                         <div class="console-panel">
                             <div class="console-header">
-                                <span class="console-title">Consola</span>
-                                <span class="console-badge">salida</span>
+                                <span class="console-title">Salida</span>
                             </div>
                             <div class="console-body">
                             </div>
@@ -134,4 +133,5 @@
         });
     </script>
 </body>
+
 </html>
