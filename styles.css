@@ -284,16 +284,13 @@ main {
     border: 1px solid var(--console-border);
     overflow: hidden;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
-    
-    /* ACTIVAMOS FLEXBOX HORIZONTAL */
     display: flex;
-    flex-direction: row; /* Fuerza a los hijos a alinearse de izquierda a derecha */
-    align-items: stretch; /* Hace que el header y el body tengan exactamente la misma altura */
-    
-    /* Ajustes de tamaño ideales para tu diseño */
-    height: 45px;       /* Un tamaño compacto ideal para una barra de estado */
-    width: 35%;        /* Ocupará el ancho de la columna del panel lateral */
+    flex-direction: column;
+    height: 80px;
+    width: 19%;  /* recuadro pequeño en desktop Y móvil */
 }
+
+
 
 .console-header {
     display: flex;
@@ -309,9 +306,9 @@ main {
     display: flex;
     align-items: center;
     background-color: #1e2130;
-    padding: 0 15px;      /* Espaciado interno horizontal uniforme */
-    border-right: 1px solid var(--console-border); /* Cambiamos el borde inferior por uno lateral derecho */
-    border-bottom: none;  /* Quitamos el borde antiguo que dividía arriba/abajo */
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--console-border);
+    border-right: none;     /* elimina el borde lateral */
     flex-shrink: 0;
 }
 
@@ -363,15 +360,14 @@ main {
 }
 .console-body2 {
     flex: 1;
-    display: flex;        /* Activamos flexbox interno para centrar el texto que pongas aquí */
-    align-items: center;  
-    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.85rem;
     color: #8a9ab5;
     background-color: var(--console-bg);
-    overflow-y: auto;
-    min-height: 0;        /* Eliminamos el min-height de 80px que deformaba el contenedor */
+    min-height: 60px; /* altura mínima visible */
 }
 
 
@@ -517,4 +513,11 @@ section {
     display: flex;
     flex-direction: column;
     /* texto arriba, workspace abajo */
+}
+
+@media (max-width: 860px) {
+    .console-panel2 {
+        width: 45%; /* mantiene el tamaño pequeño en móvil también */
+        height: 80px;
+    }
 }
