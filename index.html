@@ -5,95 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <title>Document</title>
 </head>
 
 <body>
 
     <header class="app-header text-white p-3">
-        <img src="Csharp_Logo.png" class="logo" alt="C# Logo">
+        <img src="/img/Csharp_Logo.png" class="logo" alt="C# Logo">
         <h1>Interpreter</h1>
     </header>
 
     <div class="layout d-flex">
 
         <button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">
+            &#9776;
         </button>
 
         <div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
 
         <aside class="app-sidebar text-white p-4 shadow" id="sidebar">
             <h4 class="mb-4">MENÚ</h4>
-            <button class="nav-btn">Inicio</button>
-            <button class="nav-btn">Estructuras selectivas</button>
-            <button class="nav-btn">Ciclos</button>
-            <button class="nav-btn">Arreglos unidimensionales</button>
-            <button class="nav-btn">Arreglos bidimensionales</button>
-            <button class="nav-btn">Recursividad</button>
-            <button class="nav-btn">Archivos</button>
+
+            <button class="nav-btn" id="btn-inicio">Inicio</button>
+
+            <!-- Estructuras selectivas -->
+            <div class="nav-group">
+                <button class="nav-btn has-sub">
+                    Estructuras selectivas
+                    <span class="nav-arrow">&#9662;</span>
+                </button>
+                <div class="nav-sub">
+                    <button class="nav-sub-btn" data-tema="if">if</button>
+                    <button class="nav-sub-btn" data-tema="switch">switch</button>
+                    <button class="nav-sub-btn" data-tema="ternario">ternario</button>
+                </div>
+            </div>
+
+            <div class="nav-group">
+                <button class="nav-btn has-sub">
+                    Ciclos
+                    <span class="nav-arrow">&#9662;</span>
+                </button>
+                <div class="nav-sub">
+                    <button class="nav-sub-btn" data-tema="Ciclos_for">for</button>
+                    <button class="nav-sub-btn" data-tema="Ciclos_while">while</button>
+                    <button class="nav-sub-btn" data-tema="Ciclos_dowhile">do-while</button>
+                </div>
+            </div>
+
+            <button class="nav-btn" data-tema="arreglos_uni">Arreglos unidimensionales</button>
+            <button class="nav-btn" data-tema="arreglos_bi">Arreglos bidimensionales</button>
+            <button class="nav-btn" data-tema="recursividad">Recursividad</button>
+            <button class="nav-btn" data-tema="archivos">Archivos</button>
+
         </aside>
 
         <main class="text-white p-3 p-md-4 flex-grow-1">
             <section>
-                <div class="explanation-text">
-                    <p>Este intérprete ejecuta el código paso a paso. Usa los botones para avanzar o reproducir
-                        automáticamente.</p>
-                </div>
-                <div class="workspace">
-                    <!--Panel editor de código -->
-                    <div class="console-panel editor-panel">
-                        <div class="console-header">
-                            <span class="console-title">Editor</span>
-                        </div>
-                        <div class="editor-body">
+                <!-- Título del tema activo -->
+                <div id="tema-titulo"></div>
 
-                        </div>
-                        <div class="editor-controls">
-                            <button class="ctrl-btn"> Reiniciar</button>
-                            <button class="ctrl-btn" disabled> Anterior</button>
-                            <button class="ctrl-btn">Siguiente</button>
-                            <button class="ctrl-btn primary"> Reproducir</button>
-                            <div class="ctrl-progress">
-                                <span class="ctrl-step">Paso 0 / 0</span>
-                                <div class="pbar"><i></i></div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Definición / descripción del tema activo -->
+                <div class="explanation-text" id="tema-descripcion" style="display:none;"></div>
 
-                    <div class="side-panels">
-
-                        <!-- Panel 1 -->
-                        <div class="console-panel2">
-                            <div class="console-header2">
-                                <span class="console-title2">Paso actual</span>
-                            </div>
-                            <div class="console-body2">
-                            </div>
-                        </div>
-
-                        <!-- Panel 2 -->
-                        <div class="console-panel">
-                            <div class="console-header">
-                                <span class="console-title">Variables</span>
-                            </div>
-                            <div class="console-body">
-                            </div>
-                        </div>
-
-                        <!-- Panel 3 -->
-                        <div class="console-panel">
-                            <div class="console-header">
-                                <span class="console-title">Salida</span>
-                            </div>
-                            <div class="console-body">
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
+                <!-- Consolas (se inyectan al seleccionar un tema) -->
+                <div id="workspace-container"></div>
             </section>
         </main>
 
@@ -102,36 +79,14 @@
     <footer class="app-footer text-center p-3">c#</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/consolas.js"></script>
+    <script src="/js/temas/Ciclos_for.js"></script>
+    <script src="/js/temas/Ciclos_while.js"></script>
+    <script src="/js/temas/Ciclos_dowhile.js"></script>
+    <script src="/js/temas/if.js"></script>
+    <script src="/js/temas/switch.js"></script>
+    <script src="/js/temas/ternario.js"></script>
+    <script src="/js/script.js"></script>
 
-    <script>
-        const toggleBtn = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-
-        function openSidebar() {
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-            document.body.classList.add('sidebar-open');
-        }
-
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-            document.body.classList.remove('sidebar-open');
-        }
-
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-        });
-
-        overlay.addEventListener('click', closeSidebar);
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (window.innerWidth < 768) closeSidebar();
-            });
-        });
-    </script>
 </body>
-
 </html>
