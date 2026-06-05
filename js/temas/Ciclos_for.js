@@ -1,7 +1,7 @@
 window.temas = window.temas || {};
 
 window.temas['Ciclos_for'] = {
-    titulo: 'Ciclo: for',
+    titulo: 'For',
     definicion: `
         <p>El ciclo <strong>for</strong> repite un bloque de instrucciones un número 
         determinado de veces. Se compone de tres partes:</p>
