@@ -76,7 +76,7 @@ main {
 /* ---- Colapsable en desktop ---- */
 @media (min-width: 768px) {
     .app-sidebar {
-        width: 62px;
+        width: 50px; /* MODIFICADO: Reducido a 50px para hacerlo extremadamente estrecho y maximizar el espacio del body */
         overflow: hidden;
         transition: width 0.28s ease;
         padding: 16px 0 !important;
@@ -88,11 +88,29 @@ main {
         padding: 16px 10px !important;
     }
 
-    /* Íconos centrados (incluye has-sub para ganar especificidad) */
+    /* Alineación de iconos en modo colapsado */
     .app-sidebar:not(:hover) .nav-btn,
     .app-sidebar:not(:hover) .nav-btn.has-sub {
+        position: relative;
+        padding: 0 !important;
+        height: 44px;
+        margin-bottom: 10px;
         justify-content: center !important;
-        padding: 12px 0 !important;
+    }
+
+    /* Centrado absoluto matemático del icono basado en el nuevo ancho */
+    .app-sidebar:not(:hover) .nav-btn .nav-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0 !important;
+    }
+
+    /* Evita que los textos y flechas colapsados alteren el espacio del Flexbox */
+    .app-sidebar:not(:hover) .nav-label,
+    .app-sidebar:not(:hover) .nav-arrow {
+        display: none !important;
     }
 
     /* Submenús forzados a oculto cuando colapsado */
@@ -350,8 +368,6 @@ main {
     min-height: 60px;
 }
 
-
-
 /* ===============================================
    EDITOR GRANDE
    =============================================== */
@@ -368,8 +384,6 @@ main {
     overflow-y: auto;
     line-height: 1.8;
 }
-
-
 
 .side-panels .console-panel .console-body { min-height: 140px; }
 
@@ -537,7 +551,6 @@ section {
 
 .nav-sub-btn:active { transform: scale(0.98); }
 
-
 /* ===============================================
    TÍTULO DEL TEMA ACTIVO
    =============================================== */
@@ -548,12 +561,9 @@ section {
     margin-bottom: 12px;
 }
 
-
 /* ===============================================
    ÍCONOS DEL SIDEBAR
    =============================================== */
-
-/* El botón necesita flex para alinear ícono + texto */
 .nav-btn {
     display: flex;
     align-items: center;
@@ -565,13 +575,11 @@ section {
     height: 18px;
     object-fit: contain;
     flex-shrink: 0;
-    /* Convierte cualquier PNG oscuro a blanco */
     filter: brightness(0) invert(1);
     opacity: 0.75;
     transition: opacity 0.2s, filter 0.2s;
 }
 
-/* Al hacer hover el ícono toma el color verde */
 .nav-btn:hover .nav-icon {
     filter: brightness(0) saturate(100%)
             invert(55%) sepia(60%)
@@ -580,15 +588,12 @@ section {
     opacity: 1;
 }
 
-/* El botón con submenú también necesita el ícono alineado */
 .nav-btn.has-sub {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* El texto ocupa el espacio central,
-   la flecha se queda al final */
 .nav-btn.has-sub .nav-icon {
     flex-shrink: 0;
 }
