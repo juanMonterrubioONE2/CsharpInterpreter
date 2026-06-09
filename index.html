@@ -1,12 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/styles.css">
-    <title>Document</title>
+    <title>C# Interpreter</title>
+    <style>
+        /* ── PANTALLA DE INICIO ── */
+        #pantalla-inicio {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        /* Hero */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 70px 60px 60px 60px;
+            border-bottom: 1px solid #2a2d3a;
+        }
+
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; padding: 40px 24px; gap: 40px; }
+        }
+
+        .hero-left h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .hero-left h2 span { color: var(--green-main); }
+
+        .hero-left p {
+            color: #8a9ab5;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 0;
+            max-width: 480px;
+        }
+
+        /* Stats hero derecha */
+        .hero-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 40px;
+            border-left: 2px solid #2a2d3a;
+        }
+
+        @media (max-width: 900px) {
+            .hero-stats {
+                border-left: none;
+                border-top: 2px solid #2a2d3a;
+                padding-left: 0;
+                padding-top: 30px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        .stat-item { display: flex; align-items: baseline; gap: 10px; }
+
+        .stat-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--white);
+            white-space: nowrap;
+        }
+
+        .stat-num span { color: var(--green-main); }
+        .stat-label { font-size: 0.9rem; color: #8a9ab5; }
+
+        /* ── SECCIÓN GLOSARIO EN INICIO ── */
+        .inicio-glosario {
+            padding: 60px 60px;
+        }
+
+        @media (max-width: 900px) { .inicio-glosario { padding: 40px 24px; } }
+
+        .inicio-glosario h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .inicio-glosario .sub {
+            color: #8a9ab5;
+            font-size: 0.9rem;
+            margin-bottom: 36px;
+        }
+    </style>
 </head>
 
 <body>
@@ -17,11 +111,10 @@
     </header>
 
     <div class="layout d-flex">
-        <button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">
-            &#9776;
-        </button>
+        <button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">&#9776;</button>
         <div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
-        <aside class="app-sidebar text-white p-4 shadow" id="sidebar">
+
+        <aside class="app-sidebar text-white shadow" id="sidebar">
             <h4 class="mb-4">MENÚ</h4>
 
             <button class="nav-btn" id="btn-inicio">
@@ -77,24 +170,105 @@
 
             <button class="nav-btn" data-tema="Glosario" id="btn-glosario">
                 <img src="./img/iconos/glosario.png" class="nav-icon" alt="">
-                <span class="nav-label">Glosario</span>
+                <span class="nav-label">Glosario</span> 
             </button>
         </aside>
 
-        <main class="text-white p-3 p-md-4 flex-grow-1">
-            <section>
+        <main class="text-white flex-grow-1" style="padding:0; overflow-y:auto;" id="main-content">
+
+            <div id="pantalla-inicio">
+
+                <!-- HERO -->
+                <div class="hero">
+                    <div class="hero-left">
+                        <h2>Visualiza la ejecución<br>del <span>código C#</span></h2>
+                        <p>Aprende algorítmica paso a paso. Escribe código, observa cómo se comporta la memoria, el stack de llamadas y las estructuras de datos en tiempo real.</p>
+                    </div>
+                </div>
+
+                <!-- GLOSARIO INTEGRADO EN INICIO -->
+                <div class="inicio-glosario">
+                    <h3>Glosario de Conceptos</h3>
+                    <p class="sub">Selecciona un área temática para revisar sus definiciones, casos prácticos y conclusiones analógicas.</p>
+
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Selectivas')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="p-2 rounded" style="background-color: rgba(4,170,109,0.1);">
+                                        <img src="./img/iconos/Selectivas.png" class="nav-icon" alt="">
+                                    </div>
+                                </div>
+                                <h4 class="text-white fw-bold mb-1">Estructuras Selectivas</h4>
+                                <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre la toma de decisiones lógicas en el código.</p>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Ciclos')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="p-2 rounded" style="background-color: rgba(123,44,191,0.1);">
+                                        <img src="./img/iconos/Ciclos.png" class="nav-icon" alt="">
+                                    </div>
+                                </div>
+                                <h4 class="text-white fw-bold mb-1">Ciclos</h4>
+                                <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre repeticiones de bloques de código.</p>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Array_unidimensional')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="p-2 rounded" style="background-color: rgba(4,170,109,0.1);">
+                                        <img src="./img/iconos/Array_Unidimensional.png" class="nav-icon" alt="">
+                                    </div>
+                                </div>
+                                <h4 class="text-white fw-bold mb-1">Arreglos Unidimensionales</h4>
+                                <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre almacenamiento lineal en una sola fila de datos consecutivos.</p>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Array_bidimensional')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="p-2 rounded" style="background-color: rgba(4,170,109,0.1);">
+                                        <img src="./img/iconos/Array_Bidimensional.png" class="nav-icon" alt="">
+                                    </div>
+                                </div>
+                                <h4 class="text-white fw-bold mb-1">Arreglos Bidimensionales</h4>
+                                <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales organizados en tablas formadas por filas y columnas.</p>
+                            </button>
+                        </div>
+
+                        <div class="col">
+                            <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Recursividad')">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="p-2 rounded" style="background-color: rgba(255,193,7,0.1);">
+                                        <img src="./img/iconos/Recursividad.png" class="nav-icon" alt="">
+                                    </div>
+                                </div>
+                                <h4 class="text-white fw-bold mb-1">Recursividad</h4>
+                                <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre funciones que dividen un problema llamándose a sí mismas.</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- ══ FIN PANTALLA INICIO ══ -->
+
+            <!-- Contenido dinámico de módulos -->
+            <section id="seccion-tema" style="display:none; padding: 20px;">
                 <div id="tema-titulo"></div>
                 <div class="explanation-text" id="tema-descripcion" style="display:none;"></div>
-
                 <div id="grid-modulos" class="row row-cols-1 row-cols-md-2 g-4 mb-4"></div>
-
                 <div id="workspace-container"></div>
             </section>
         </main>
 
     </div>
 
-    <footer class="app-footer text-center p-3">c#</footer>
+    <footer class="app-footer text-center p-3">C# Interpreter</footer>
 
     <dialog id="modal-concepto" class="custom-modal">
         <div class="modal-content-wrapper">
@@ -104,24 +278,16 @@
                 </div>
                 <button class="modal-close-x" onclick="cerrarConceptoModal()">&times;</button>
             </div>
-
             <div class="custom-modal-body">
                 <span class="modal-subtitle" id="modal-subtitulo">ANALOGÍA</span>
                 <h3 class="modal-main-topic" id="modal-tema-nombre">Cargando...</h3>
                 <p class="modal-description" id="modal-descripcion-texto">Definición...</p>
-
                 <div class="modal-card-case">
-                    <div class="card-case-header">
-                        <strong>Caso Práctico:</strong>
-                    </div>
+                    <div class="card-case-header"><strong>Caso Práctico:</strong></div>
                     <p class="card-case-text" id="modal-caso-practico">Ejemplo...</p>
                 </div>
-
-                <p class="modal-footer-abstract" id="modal-abstraccion-conclusión">
-                    Conclusión...
-                </p>
+                <p class="modal-footer-abstract" id="modal-abstraccion-conclusión">Conclusión...</p>
             </div>
-
             <div class="custom-modal-footer">
                 <button class="ctrl-btn primary px-4 py-2" onclick="cerrarConceptoModal()">Entendido</button>
             </div>
@@ -143,5 +309,4 @@
     <script src="./js/script.js"></script>
 
 </body>
-
 </html>

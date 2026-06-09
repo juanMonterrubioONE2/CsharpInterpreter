@@ -1,9 +1,26 @@
 // ============================================================
+//  HELPERS — mostrar / ocultar pantallas
+// ============================================================
+function mostrarPantallaInicio() {
+    const inicio = document.getElementById('pantalla-inicio');
+    const tema   = document.getElementById('seccion-tema');
+    if (inicio) inicio.style.display = 'flex';
+    if (tema)   tema.style.display   = 'none';
+}
+
+function mostrarPantallaTema() {
+    const inicio = document.getElementById('pantalla-inicio');
+    const tema   = document.getElementById('seccion-tema');
+    if (inicio) inicio.style.display = 'none';
+    if (tema)   tema.style.display   = 'block';
+}
+
+// ============================================================
 //  SIDEBAR — abrir / cerrar en móvil
 // ============================================================
 const toggleBtn = document.getElementById('sidebarToggle');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('sidebarOverlay');
 
 function openSidebar() {
     sidebar.classList.add('open');
@@ -17,24 +34,15 @@ function closeSidebar() {
     document.body.classList.remove('sidebar-open');
 }
 
-if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
-    });
-}
+if (toggleBtn) toggleBtn.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+});
 
-if (overlay) {
-    overlay.addEventListener('click', closeSidebar);
-}
+if (overlay) overlay.addEventListener('click', closeSidebar);
 
-// Evita que las categorías principales del menú cierren el sidebar en celular
 document.querySelectorAll('.nav-btn, .nav-sub-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        // Verificamos si el botón presionado abre un acordeón secundario
-        const esCategoriaConSubmenu = btn.classList.contains('has-sub');
-
-        // Solo cerramos si está en móvil Y NO es un menú desplegable principal
-        if (window.innerWidth < 768 && !esCategoriaConSubmenu) {
+        if (window.innerWidth < 768 && !btn.classList.contains('has-sub')) {
             closeSidebar();
         }
     });
@@ -46,12 +54,9 @@ document.querySelectorAll('.nav-btn, .nav-sub-btn').forEach(btn => {
 document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
-
-        const group = btn.closest('.nav-group');
+        const group  = btn.closest('.nav-group');
         const isOpen = group.classList.contains('open');
-
         document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
-
         if (!isOpen) group.classList.add('open');
     });
 });
@@ -61,81 +66,74 @@ document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
 // ============================================================
 function mostrarDescripcion(titulo, definicion) {
     const elTitulo = document.getElementById('tema-titulo');
-    const elDesc = document.getElementById('tema-descripcion');
-
-    if (elTitulo) {
-        elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
-    }
-
+    const elDesc   = document.getElementById('tema-descripcion');
+    if (elTitulo) elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
     if (elDesc) {
-        if (definicion) {
-            elDesc.innerHTML = definicion;
-            elDesc.style.display = 'block';
-        } else {
-            elDesc.innerHTML = '';
-            elDesc.style.display = 'none';
-        }
+        if (definicion) { elDesc.innerHTML = definicion; elDesc.style.display = 'block'; }
+        else            { elDesc.innerHTML = '';          elDesc.style.display = 'none';  }
     }
 }
 
 function limpiarPantalla() {
-    const workspace = document.getElementById('workspace-container');
+    const workspace   = document.getElementById('workspace-container');
     const gridModulos = document.getElementById('grid-modulos');
-
-    if (workspace) workspace.innerHTML = '';
+    if (workspace)   workspace.innerHTML   = '';
     if (gridModulos) gridModulos.innerHTML = '';
     mostrarDescripcion('', '');
 }
 
 // ============================================================
-//  NAVEGACIÓN — cargar tema al hacer click
+//  NAVEGACIÓN — cargar tema al hacer click en sidebar
 // ============================================================
 document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]').forEach(btn => {
     btn.addEventListener('click', () => {
         const tema = btn.dataset.tema;
-        // CORRECCIÓN: Ignora "Glosario" aquí para evitar que falle al buscarlo en window.temas
-        if (tema && tema !== "Glosario") {
-            limpiarPantalla();
-            cargarTema(tema);
+        if (!tema) return;
+
+        if (tema === 'Glosario') {
+            // Glosario → se maneja por su propio listener abajo
+            return;
         }
+
+        // Cualquier otro tema → mostrar sección de tema
+        limpiarPantalla();
+        mostrarPantallaTema();
+        cargarTema(tema);
     });
 });
 
 function cargarTema(nombreTema) {
     if (!window.temas || !window.temas[nombreTema]) return;
     const datos = window.temas[nombreTema];
-
     mostrarDescripcion(datos.titulo, datos.definicion);
-
-    if (typeof insertarConsolas === "function") {
-        insertarConsolas();
-    }
+    if (typeof insertarConsolas === 'function') insertarConsolas();
 }
 
 // ============================================================
-//  VISTA DE GLOSARIO (TARJETAS Y MODALES) — CORREGIDO
+//  VISTA DE GLOSARIO (desde sidebar)
 // ============================================================
 function cargarGlosario() {
-    const workspaceContainer = document.getElementById("workspace-container");
-    const gridModulos = document.getElementById("grid-modulos");
-    const temaTitulo = document.getElementById("tema-titulo");
-    const temaDescripcion = document.getElementById("tema-descripcion");
+    limpiarPantalla();
+    mostrarPantallaTema();
 
-    if (workspaceContainer) workspaceContainer.innerHTML = "";
+    const temaTitulo = document.getElementById('tema-titulo');
+    const temaDesc   = document.getElementById('tema-descripcion');
+    const gridModulos = document.getElementById('grid-modulos');
+
     if (temaTitulo) {
         temaTitulo.innerHTML = `
             <h2 class="fw-bold text-white mb-1">Glosario de Conceptos</h2>
             <p class="text-muted small mb-4">Selecciona un área temática para revisar sus definiciones, casos prácticos y conclusiones analógicas.</p>
         `;
     }
-    if (temaDescripcion) temaDescripcion.style.display = "none";
+    if (temaDesc) temaDesc.style.display = 'none';
 
     if (gridModulos) {
         gridModulos.innerHTML = `
             <div class="col">
                 <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Selectivas')">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="p-2 rounded card-icon-box" style="background-color: rgba(4, 170, 109, 0.1); color: var(--green-main);">
+                        <div class="p-2 rounded" style="background-color:rgba(4,170,109,0.1);">
                             <img src="./img/iconos/Selectivas.png" class="nav-icon" alt="">
                         </div>
                     </div>
@@ -143,11 +141,10 @@ function cargarGlosario() {
                     <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre la toma de decisiones lógicas en el código.</p>
                 </button>
             </div>
-
             <div class="col">
                 <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Ciclos')">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="p-2 rounded card-icon-box" style="background-color: rgba(123, 44, 191, 0.1); color: #a29bfe;">
+                        <div class="p-2 rounded" style="background-color:rgba(123,44,191,0.1);">
                             <img src="./img/iconos/Ciclos.png" class="nav-icon" alt="">
                         </div>
                     </div>
@@ -155,11 +152,10 @@ function cargarGlosario() {
                     <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre repeticiones de bloques de código.</p>
                 </button>
             </div>
-
             <div class="col">
                 <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Array_unidimensional')">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="p-2 rounded card-icon-box" style="background-color: rgba(4, 170, 109, 0.1); color: var(--green-main);">
+                        <div class="p-2 rounded" style="background-color:rgba(4,170,109,0.1);">
                             <img src="./img/iconos/Array_Unidimensional.png" class="nav-icon" alt="">
                         </div>
                     </div>
@@ -167,11 +163,10 @@ function cargarGlosario() {
                     <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre almacenamiento lineal en una sola fila de datos consecutivos.</p>
                 </button>
             </div>
-
             <div class="col">
                 <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Array_bidimensional')">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="p-2 rounded card-icon-box" style="background-color: rgba(4, 170, 109, 0.1); color: var(--green-main);">
+                        <div class="p-2 rounded" style="background-color:rgba(4,170,109,0.1);">
                             <img src="./img/iconos/Array_Bidimensional.png" class="nav-icon" alt="">
                         </div>
                     </div>
@@ -179,16 +174,15 @@ function cargarGlosario() {
                     <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales organizados en tablas formadas por filas y columnas.</p>
                 </button>
             </div>
-
             <div class="col">
                 <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('Recursividad')">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div class="p-2 rounded card-icon-box" style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                        <div class="p-2 rounded" style="background-color:rgba(255,193,7,0.1);">
                             <img src="./img/iconos/Recursividad.png" class="nav-icon" alt="">
                         </div>
                     </div>
                     <h4 class="text-white fw-bold mb-1">Recursividad</h4>
-                    <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre funciones que dividen un problem llamándose a sí mismas.</p>
+                    <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre funciones que dividen un problema llamándose a sí mismas.</p>
                 </button>
             </div>
         `;
@@ -198,39 +192,31 @@ function cargarGlosario() {
 // ============================================================
 //  GESTIÓN DE EVENTOS DOM
 // ============================================================
-document.addEventListener("DOMContentLoaded", () => {
-    const btnInicio = document.getElementById("btn-inicio");
-    const btnGlosario = document.getElementById("btn-glosario");
+document.addEventListener('DOMContentLoaded', () => {
+    const btnInicio   = document.getElementById('btn-inicio');
+    const btnGlosario = document.getElementById('btn-glosario');
 
-    // Evento para el botón Inicio
+    // Botón Inicio → volver a la pantalla de inicio
     if (btnInicio) {
-        btnInicio.addEventListener("click", () => {
-            limpiarPantalla();
-            const temaTitulo = document.getElementById("tema-titulo");
-            if (temaTitulo) {
-                temaTitulo.innerHTML = `
-                    <h2 class="fw-bold text-white mb-1">Bienvenido al Intérprete de C#</h2>
-                    <p class="text-muted small">Selecciona una opción del menú lateral para comenzar.</p>
-                `;
-            }
+        btnInicio.addEventListener('click', () => {
+            mostrarPantallaInicio();
         });
     }
 
-    // Evento para el botón Glosario
+    // Botón Glosario → cargar vista glosario en seccion-tema
     if (btnGlosario) {
-        btnGlosario.addEventListener("click", (e) => {
-            e.stopPropagation(); 
-            limpiarPantalla();
+        btnGlosario.addEventListener('click', (e) => {
+            e.stopPropagation();
             cargarGlosario();
         });
     }
 
-    // Carga inicial por defecto: Pantalla de Inicio vacía
-    if (btnInicio) btnInicio.click();
+    // Arrancar mostrando la pantalla de inicio (sin limpiar ni tocar seccion-tema)
+    mostrarPantallaInicio();
 });
 
 // ============================================================
-//  DICCIONARIO DE DATOS Y GESTIÓN DE MODALES
+//  DICCIONARIO Y MODALES
 // ============================================================
 const diccionarioTemas = {
     "Selectivas": {
@@ -244,59 +230,45 @@ const diccionarioTemas = {
         titulo: "Ciclos",
         concepto: "Los ciclos permiten ejecutar un bloque de instrucciones varias veces mientras se cumpla una condición o hasta alcanzar un número determinado de repeticiones.",
         ejemplos: "for, while, do-while",
-        caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo. Le dices a la computadora: 'Empieza con un contador en 1, muwstralo en pantalla, súmale 1 a ese contador y repite el proceso'. La máquina repetirá la instrucción de forma automática vuelta tras vuelta y se detendrá inmediatamente cuando el contador llegue a 11, logrando mostrar la lista en un instante.\"",
+        caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo.\"",
         conclusion: "Los ciclos nos evitan el trabajo aburrido de duplicar código manualmente. Nos permiten procesar tareas repetitivas de forma automática, exacta y en fracciones de segundo."
     },
     "Array_unidimensional": {
         titulo: "Arreglos Unidimensionales",
         concepto: "Un arreglo unidimensional es una estructura de datos que almacena varios elementos del mismo tipo en una sola fila de posiciones consecutivas.",
         ejemplos: "Vectores, Listas Simples, Índices",
-        caso: "\"Imagina que necesitas guardar las 5 calificaciones de un alumno. En lugar de crear 5 variables individuales (como calif1, calif2, etc.), creas una sola fila de casilleros en la memoria llamada 'Calificaciones' con espacio para 5 datos. La computadora numera cada espacio desde el 0. Así, en la posición 0 guardas el 8.5, en la posición 1 el 9.0, y puedes leer o modificar cualquier nota rápidamente solo diciendo el número de casillero al que quieres entrar.\"",
+        caso: "\"Imagina que necesitas guardar las 5 calificaciones de un alumno. En lugar de crear 5 variables individuales, creas una sola fila de casilleros en la memoria.\"",
         conclusion: "Los arreglos unidimensionales son ideales para manejar listas simples de datos bajo un único nombre, manteniendo la información agrupada, ordenada y fácil de acceder."
     },
     "Array_bidimensional": {
         titulo: "Arreglos Bidimensionales",
         concepto: "Un arreglo bidimensional organiza los datos en filas y columnas, similar a una tabla o matriz.",
         ejemplos: "Matrices, Tablas de datos, Cuadrículas",
-        caso: "\"Imagina que ahora no quieres registrar las notas de un solo alumno, sino las calificaciones de varios alumnos de un grupo. Para esto usas una cuadrícula tipo Excel: cada fila representa a un estudiante diferente (Alumno 0, Alumno 1, Alumno 2) y cada columna representa una materia distinta (Matemáticas en Columna 0, Historia en Columna 1). Si el programa quiere revisar la nota de Historia del segundo alumno, va directo a la intersección exacta de la Fila 1, Columna 1.\"",
+        caso: "\"Imagina que quieres registrar las calificaciones de varios alumnos. Cada fila es un alumno y cada columna es una materia.\"",
         conclusion: "Los arreglos bidimensionales son la estructura perfecta cuando los datos tienen relaciones más complejas, permitiéndonos crear mapas, tablas y bases de datos ordenadas en dos dimensiones."
     },
     "Recursividad": {
         titulo: "Recursividad",
-        concepto: "La recursividad es una técnica donde una función se llama a sí misma para resolver un problema dividiéndolo en problemas más pequeños. Toda función recursiva debe tener una condición de parada para evitar llamadas infinitas.",
+        concepto: "La recursividad es una técnica donde una función se llama a sí misma para resolver un problema dividiéndolo en problemas más pequeños. Toda función recursiva debe tener una condición de parada.",
         ejemplos: "Caso Base, Caso Recursivo, Pila de Llamadas",
-        caso: "\"Imagina que quieres calcular el factorial de un número (como el factorial de 4, que consiste en multiplicar 4x3x2x1). El enfoque recursivo resuelve esto diciendo: 'Para calcular el factorial de 4, primero necesito resolver el factorial de 3 y multiplicarlo por 4'. La función se detiene a sí misma y abre un subproceso para calcular el factorial de 3, el cual a su vez pide el de 2, y así sucesivamente. Cuando llega al caso base (el número 1), el programa deja de abrir subprocesos y empieza a regresar multiplicando los resultados hacia atrás hasta entregarte el valor final de 24.\"",
-        conclusion: "La recursividad es una forma elegante de programar donde un problema gigante se desarma a sí mismo en piezas idénticas cada vez más pequeñas, solucionándose de adentro hacia afuera."
+        caso: "\"Para calcular el factorial de 4, la función pide el factorial de 3, que pide el de 2, y así hasta llegar al caso base (1). Luego multiplica de vuelta.\"",
+        conclusion: "La recursividad es una forma elegante de programar donde un problema gigante se desarma en piezas idénticas cada vez más pequeñas, solucionándose de adentro hacia afuera."
     }
 };
 
 function abrirConceptoModal(idTema) {
     const modal = document.getElementById('modal-concepto');
     const datos = diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
-
     if (!modal) return;
 
-    document.getElementById('modal-titulo').innerText = datos.titulo;
-    document.getElementById('modal-descripcion-texto').innerText = datos.concepto;
-    document.getElementById('modal-caso-practico').innerText = datos.caso;
+    document.getElementById('modal-titulo').innerText             = datos.titulo;
+    document.getElementById('modal-descripcion-texto').innerText  = datos.concepto;
+    document.getElementById('modal-caso-practico').innerText      = datos.caso;
     document.getElementById('modal-abstraccion-conclusión').innerText = datos.conclusion;
 
-    // Gestión del texto de Ejemplos
-    const contenedorEjemplos = document.getElementById('modal-contenedor-ejemplos');
-    const txtEjemplos = document.getElementById('modal-ejemplos-lista');
-
-    if (contenedorEjemplos && txtEjemplos) {
-        if (datos.ejemplos) {
-            txtEjemplos.innerText = datos.ejemplos;
-            contenedorEjemplos.style.display = 'block';
-        } else {
-            contenedorEjemplos.style.display = 'none';
-        }
-    }
-
-    const sub = document.getElementById('modal-subtitulo');
+    const sub  = document.getElementById('modal-subtitulo');
     const tema = document.getElementById('modal-tema-nombre');
-    if (sub) sub.style.display = 'none';
+    if (sub)  sub.style.display  = 'none';
     if (tema) tema.style.display = 'none';
 
     modal.showModal();
@@ -307,19 +279,14 @@ function cerrarConceptoModal() {
     if (modal) modal.close();
 }
 
-// Cierre al dar click en la zona difuminada exterior
 const modalElemento = document.getElementById('modal-concepto');
 if (modalElemento) {
-    modalElemento.addEventListener('click', function (event) {
+    modalElemento.addEventListener('click', function(event) {
         const rect = this.getBoundingClientRect();
         const clicFuera = (
-            event.clientX < rect.left ||
-            event.clientX > rect.right ||
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom
+            event.clientX < rect.left || event.clientX > rect.right ||
+            event.clientY < rect.top  || event.clientY > rect.bottom
         );
-        if (clicFuera) {
-            this.close();
-        }
+        if (clicFuera) this.close();
     });
 }
