@@ -5,6 +5,10 @@
     --console-bg: #1a1b22;
     --console-header: #282A35;
     --console-border: #3a3d4a;
+    /* Sidebar */
+    --sidebar-collapsed: 80px;
+    --sidebar-expanded: 260px;
+    --sidebar-transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ================= BODY ================= */
@@ -63,28 +67,72 @@ main {
     min-width: 0;
 }
 
-/* ================= SIDEBAR ================= */
+/* ================= SIDEBAR COLAPSABLE ================= */
 .app-sidebar {
     background-color: var(--dark);
-    border-right: none;
-    padding: 10px;
-    width: 260px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    width: var(--sidebar-collapsed);
     flex-shrink: 0;
-    overflow-y: auto;
+    overflow: hidden;
+    transition: width var(--sidebar-transition);
+    position: relative;
+    z-index: 50;
+    scrollbar-width: none;
+    padding: 10px 6px;
+    box-sizing: border-box;
 }
 
+.app-sidebar::-webkit-scrollbar { display: none; }
+
+.app-sidebar:hover {
+    width: var(--sidebar-expanded);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.45);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding: 10px;
+}
+
+.app-sidebar:hover::-webkit-scrollbar { display: block; width: 4px; }
+.app-sidebar:hover::-webkit-scrollbar-track { background: transparent; }
+.app-sidebar:hover::-webkit-scrollbar-thumb { background: #3B4252; border-radius: 4px; }
+
+/* Título MENÚ */
 .app-sidebar h4 {
     color: #bfc6d1;
     font-size: 0.72rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-bottom: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity var(--sidebar-transition);
+    padding-top: 8px;
+    padding-left: 6px;
 }
+
+.app-sidebar:hover h4 { opacity: 1; }
+
+/* Indicador verde cuando colapsado */
+.app-sidebar::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 36px;
+    background: var(--green-main);
+    border-radius: 2px 0 0 2px;
+    opacity: 0.5;
+    transition: opacity var(--sidebar-transition), height var(--sidebar-transition);
+}
+
+.app-sidebar:hover::after { opacity: 0; height: 0; }
 
 /* ================= BOTONES NAV ================= */
 .nav-btn {
     width: 100%;
-    padding: 12px 16px;
+    padding: 11px 10px;
     background-color: transparent;
     color: var(--white);
     border: none;
@@ -92,22 +140,118 @@ main {
     text-align: left;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: 0.2s;
-    margin-bottom: 10px;
+    transition: background-color 0.2s, transform 0.15s;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .nav-btn:hover {
     background-color: var(--green-main);
     color: var(--white);
-    transform: translateX(3px);
 }
 
-.nav-btn:active {
-    transform: scale(0.98);
+.nav-btn:active { transform: scale(0.98); }
+
+/* Labels y flechas: ocultos cuando colapsado */
+.nav-label {
+    opacity: 0;
+    transition: opacity var(--sidebar-transition);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+.app-sidebar:hover .nav-label { opacity: 1; }
+
+.nav-arrow {
+    font-size: 0.7rem;
+    color: #8a9ab5;
+    transition: transform 0.25s ease, opacity var(--sidebar-transition);
+    flex-shrink: 0;
+    opacity: 0;
+}
+
+.app-sidebar:hover .nav-arrow { opacity: 1; }
+
+.nav-group.open .nav-arrow,
+.nav-group:hover .nav-arrow {
+    transform: rotate(180deg);
+    color: var(--green-main);
+}
+
+/* ================= ÍCONOS DEL SIDEBAR ================= */
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+    opacity: 0.7;
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+.nav-btn:hover .nav-icon {
+    filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(400%) hue-rotate(115deg) brightness(95%);
+    opacity: 1;
+}
+
+.nav-btn.has-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.nav-btn.has-sub .nav-label { flex: 1; }
+
+/* ================= SUBMENÚ ================= */
+.nav-group { margin-bottom: 4px; }
+
+.nav-sub {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding-left: 12px;
+    transition: max-height 0.28s ease, opacity 0.2s ease;
+}
+
+/* Submenú solo despliega cuando el sidebar está expandido */
+.app-sidebar:hover .nav-group:hover .nav-sub,
+.app-sidebar:hover .nav-group.open .nav-sub {
+    max-height: 200px;
+    opacity: 1;
+}
+
+.nav-sub-btn {
+    width: 100%;
+    padding: 9px 14px;
+    background-color: transparent;
+    color: #9aa1b8;
+    border: none;
+    border-left: 2px solid #1a3e1f;
+    border-radius: 0 6px 6px 0;
+    text-align: left;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: 0.15s;
+    display: block;
+    margin-bottom: 2px;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.nav-sub-btn:hover {
+    background-color: rgba(4, 170, 109, 0.12);
+    color: var(--green-main);
+    border-left-color: var(--green-main);
+    padding-left: 18px;
+}
+
+.nav-sub-btn:active { transform: scale(0.98); }
 
 /* ================= FOOTER ================= */
 .app-footer {
@@ -118,23 +262,11 @@ main {
     padding: 12px;
 }
 
-/* ================= SCROLLBAR ================= */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: #1E1F26;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #3B4252;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #4C566A;
-}
+/* ================= SCROLLBAR GLOBAL ================= */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #1E1F26; }
+::-webkit-scrollbar-thumb { background: #3B4252; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #4C566A; }
 
 /* ================= RESPONSIVIDAD MÓVIL ================= */
 .sidebar-toggle {
@@ -170,9 +302,7 @@ main {
     z-index: 150;
 }
 
-.sidebar-overlay.active {
-    display: block;
-}
+.sidebar-overlay.active { display: block; }
 
 @media (max-width: 767.98px) {
     .app-sidebar {
@@ -180,54 +310,48 @@ main {
         top: 0;
         left: 0;
         height: 100vh;
-        width: 260px;
+        width: 260px !important;
         z-index: 200;
         transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s ease !important;
         padding-top: 60px;
+        padding: 60px 10px 10px 10px;
+        overflow-y: auto !important;
+        box-shadow: none;
     }
 
     .app-sidebar.open {
         transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
     }
 
-    body.sidebar-open {
-        overflow: hidden;
+    /* Labels siempre visibles en móvil cuando abierto */
+    .app-sidebar .nav-label,
+    .app-sidebar .nav-arrow { opacity: 1; }
+
+    /* Submenús funcionan normalmente en móvil */
+    .app-sidebar .nav-group:hover .nav-sub,
+    .app-sidebar .nav-group.open .nav-sub {
+        max-height: 200px;
+        opacity: 1;
     }
 
-    .layout {
-        min-height: calc(100vh - 70px - 45px);
-    }
+    .app-sidebar::after { display: none; }
 
-    main {
-        width: 100%;
-        padding: 16px;
-    }
+    body.sidebar-open { overflow: hidden; }
 
-    h1 {
-        font-size: 1.2rem;
-    }
-
-    .logo {
-        width: 40px;
-    }
+    .layout { min-height: calc(100vh - 70px - 45px); }
+    main { width: 100%; padding: 16px; }
+    h1 { font-size: 1.2rem; }
+    .logo { width: 40px; }
 }
 
 @media (min-width: 768px) and (max-width: 991.98px) {
-    .app-sidebar {
-        width: 200px;
-    }
-
-    .nav-btn {
-        font-size: 0.85rem;
-        padding: 10px 12px;
-    }
+    :root { --sidebar-expanded: 220px; }
 }
 
 @media (min-width: 1400px) {
-    .app-sidebar {
-        width: 300px;
-    }
+    :root { --sidebar-expanded: 300px; }
 }
 
 /* ===============================================
@@ -240,17 +364,8 @@ main {
     align-items: stretch;
 }
 
-@media (max-width: 1100px) {
-    .workspace {
-        grid-template-columns: 1fr 320px;
-    }
-}
-
-@media (max-width: 860px) {
-    .workspace {
-        grid-template-columns: 1fr;
-    }
-}
+@media (max-width: 1100px) { .workspace { grid-template-columns: 1fr 320px; } }
+@media (max-width: 860px)  { .workspace { grid-template-columns: 1fr; } }
 
 /* ===============================================
    PANELES BASE
@@ -277,12 +392,7 @@ main {
     width: 19%;
 }
 
-@media (max-width: 860px) {
-    .console-panel2 {
-        width: 45%;
-        height: 80px;
-    }
-}
+@media (max-width: 860px) { .console-panel2 { width: 45%; height: 80px; } }
 
 .console-header {
     display: flex;
@@ -346,9 +456,7 @@ main {
 /* ===============================================
    EDITOR GRANDE
    =============================================== */
-.editor-panel {
-    min-height: 50px;
-}
+.editor-panel { min-height: 50px; }
 
 .editor-body {
     flex: 1;
@@ -362,9 +470,7 @@ main {
     line-height: 1.8;
 }
 
-.side-panels .console-panel .console-body {
-    min-height: 140px;
-}
+.side-panels .console-panel .console-body { min-height: 140px; }
 
 .editor-controls {
     display: flex;
@@ -395,10 +501,7 @@ main {
     color: var(--green-main);
 }
 
-.ctrl-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+.ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .ctrl-btn.primary {
     background-color: var(--green-main);
@@ -471,73 +574,6 @@ section {
 }
 
 /* ===============================================
-   SUBMENÚ DESPLEGABLE
-   =============================================== */
-.nav-group {
-    margin-bottom: 4px;
-}
-
-.nav-btn.has-sub {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0;
-}
-
-.nav-arrow {
-    font-size: 0.7rem;
-    color: #8a9ab5;
-    transition: transform 0.25s ease;
-    flex-shrink: 0;
-}
-
-.nav-group.open .nav-arrow,
-.nav-group:hover .nav-arrow {
-    transform: rotate(180deg);
-    color: var(--green-main);
-}
-
-.nav-sub {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.28s ease;
-    padding-left: 12px;
-}
-
-.nav-group:hover .nav-sub,
-.nav-group.open .nav-sub {
-    max-height: 200px;
-}
-
-.nav-sub-btn {
-    width: 100%;
-    padding: 9px 14px;
-    background-color: transparent;
-    color: #9aa1b8;
-    border: none;
-    border-left: 2px solid #1a3e1f;
-    border-radius: 0 6px 6px 0;
-    text-align: left;
-    font-size: 0.88rem;
-    cursor: pointer;
-    transition: 0.15s;
-    display: block;
-    margin-bottom: 2px;
-    font-family: inherit;
-}
-
-.nav-sub-btn:hover {
-    background-color: rgba(4, 170, 109, 0.12);
-    color: var(--green-main);
-    border-left-color: var(--green-main);
-    padding-left: 18px;
-}
-
-.nav-sub-btn:active {
-    transform: scale(0.98);
-}
-
-/* ===============================================
    TÍTULO DEL TEMA ACTIVO
    =============================================== */
 .tema-titulo-text {
@@ -548,33 +584,7 @@ section {
 }
 
 /* ===============================================
-   ÍCONOS DEL SIDEBAR
-   =============================================== */
-.nav-icon {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-    flex-shrink: 0;
-    filter: brightness(0) invert(1);
-    opacity: 0.75;
-    transition: opacity 0.2s, filter 0.2s;
-}
-
-.nav-btn:hover .nav-icon {
-    filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(400%) hue-rotate(115deg) brightness(95%);
-    opacity: 1;
-}
-
-.nav-btn.has-sub .nav-icon {
-    flex-shrink: 0;
-}
-
-.nav-btn.has-sub .nav-label {
-    flex: 1;
-}
-
-/* ===============================================
-   MODALES PERSONALIZADOS (CUSTOM DIALOG)
+   MODALES PERSONALIZADOS
    =============================================== */
 .custom-modal {
     background-color: var(--dark);
@@ -588,12 +598,10 @@ section {
     overflow: hidden;
 }
 
-/* Animación y difuminado del fondo exterior */
 .custom-modal::backdrop {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    transition: backdrop-filter 0.3s ease;
 }
 
 .modal-content-wrapper {
@@ -601,7 +609,6 @@ section {
     flex-direction: column;
 }
 
-/* Cabecera del Modal */
 .custom-modal-header {
     display: flex;
     justify-content: space-between;
@@ -627,11 +634,8 @@ section {
     transition: color 0.15s;
 }
 
-.modal-close-x:hover {
-    color: var(--white);
-}
+.modal-close-x:hover { color: var(--white); }
 
-/* Cuerpo del Modal */
 .custom-modal-body {
     padding: 24px 24px 16px 24px;
     background-color: var(--dark);
@@ -641,7 +645,6 @@ section {
     font-size: 0.68rem;
     font-weight: 700;
     color: #7b2cbf;
-    /* Color morado/azul de acento de tu captura */
     letter-spacing: 0.12em;
     text-transform: uppercase;
     display: block;
@@ -662,7 +665,6 @@ section {
     margin-bottom: 20px;
 }
 
-/* Tarjeta interna del Caso Práctico */
 .modal-card-case {
     background-color: #15161e;
     border: 1px solid rgba(123, 44, 191, 0.25);
@@ -696,7 +698,6 @@ section {
     margin: 0;
 }
 
-/* Pie del Modal */
 .custom-modal-footer {
     padding: 16px 24px;
     border-top: 1px solid var(--console-border);
@@ -705,10 +706,8 @@ section {
     justify-content: flex-end;
 }
 
-/* Ajuste del botón primario para el modal */
 .custom-modal-footer .ctrl-btn.primary {
     background-color: #5a189a;
-    /* Color morado de tu botón original */
     border-color: #5a189a;
     color: var(--white);
 }
@@ -718,7 +717,9 @@ section {
     border-color: #7b2cbf;
 }
 
-/* Estilos para transformar la tarjeta en un gran botón interactivo */
+/* ===============================================
+   TARJETAS MODULARES
+   =============================================== */
 .modular-card-btn {
     background-color: #282A35 !important;
     border: 1px solid #3a3d4a !important;
@@ -729,28 +730,20 @@ section {
     display: block;
 }
 
-/* Efecto visual al pasar el cursor (Hover) */
 .modular-card-btn:hover {
     transform: translateY(-4px);
     border-color: #a29bfe !important;
     box-shadow: 0 8px 24px rgba(162, 155, 254, 0.15);
 }
 
-/* Efecto al hacer click (Active) */
-.modular-card-btn:active {
-    transform: translateY(-1px);
-}
+.modular-card-btn:active { transform: translateY(-1px); }
 
-/* Estilo para el fondo del modal (Backdrop) */
 #modal-concepto::backdrop {
     background-color: rgba(0, 0, 0, 0.6) !important;
-    /* Fondo oscuro semitransparente */
     backdrop-filter: blur(8px);
-    /* Este es el efecto de difuminado premium */
     transition: all 0.3s ease;
 }
 
-/* Evitar bordes extraños de enfoque al abrir el diálogo */
-#modal-concepto:focus-visible {
-    outline: none;
-}
+#modal-concepto:focus-visible { outline: none; }
+
+pre { margin: 0; font-family: monospace; }

@@ -17,13 +17,10 @@
     </header>
 
     <div class="layout d-flex">
-
         <button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">
             &#9776;
         </button>
-
         <div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
-
         <aside class="app-sidebar text-white p-4 shadow" id="sidebar">
             <h4 class="mb-4">MENÚ</h4>
 
@@ -31,7 +28,7 @@
                 <img src="./img/iconos/Inicio.png" class="nav-icon" alt="">
                 <span class="nav-label">Inicio</span>
             </button>
-            
+
             <div class="nav-group">
                 <button class="nav-btn has-sub">
                     <img src="./img/iconos/Selectivas.png" class="nav-icon" alt="">
@@ -39,9 +36,9 @@
                     <span class="nav-arrow">&#9662;</span>
                 </button>
                 <div class="nav-sub">
-                    <button class="nav-sub-btn" data-tema="if">if</button>
-                    <button class="nav-sub-btn" data-tema="switch">switch</button>
-                    <button class="nav-sub-btn" data-tema="ternario">ternario</button>
+                    <button class="nav-sub-btn" data-tema="if">If</button>
+                    <button class="nav-sub-btn" data-tema="switch">Switch</button>
+                    <button class="nav-sub-btn" data-tema="ternario">Ternario</button>
                 </div>
             </div>
 
@@ -52,9 +49,9 @@
                     <span class="nav-arrow">&#9662;</span>
                 </button>
                 <div class="nav-sub">
-                    <button class="nav-sub-btn" data-tema="Ciclos_for">for</button>
-                    <button class="nav-sub-btn" data-tema="Ciclos_while">while</button>
-                    <button class="nav-sub-btn" data-tema="Ciclos_dowhile">do-while</button>
+                    <button class="nav-sub-btn" data-tema="Ciclos_for">For</button>
+                    <button class="nav-sub-btn" data-tema="Ciclos_while">While</button>
+                    <button class="nav-sub-btn" data-tema="Ciclos_dowhile">Do-While</button>
                 </div>
             </div>
 
@@ -77,13 +74,18 @@
                 <img src="./img/iconos/Archivos.png" class="nav-icon" alt="">
                 <span class="nav-label">Archivos</span>
             </button>
+
+            <button class="nav-btn" data-tema="Glosario" id="btn-glosario">
+                <img src="./img/iconos/glosario.png" class="nav-icon" alt="">
+                <span class="nav-label">Glosario</span>
+            </button>
         </aside>
 
         <main class="text-white p-3 p-md-4 flex-grow-1">
             <section>
                 <div id="tema-titulo"></div>
                 <div class="explanation-text" id="tema-descripcion" style="display:none;"></div>
-                
+
                 <div id="grid-modulos" class="row row-cols-1 row-cols-md-2 g-4 mb-4"></div>
 
                 <div id="workspace-container"></div>
@@ -102,12 +104,12 @@
                 </div>
                 <button class="modal-close-x" onclick="cerrarConceptoModal()">&times;</button>
             </div>
-            
+
             <div class="custom-modal-body">
                 <span class="modal-subtitle" id="modal-subtitulo">ANALOGÍA</span>
                 <h3 class="modal-main-topic" id="modal-tema-nombre">Cargando...</h3>
                 <p class="modal-description" id="modal-descripcion-texto">Definición...</p>
-                
+
                 <div class="modal-card-case">
                     <div class="card-case-header">
                         <strong>Caso Práctico:</strong>
@@ -141,4 +143,5 @@
     <script src="./js/script.js"></script>
 
 </body>
+
 </html>

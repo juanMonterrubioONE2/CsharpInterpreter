@@ -27,7 +27,7 @@ if (overlay) {
     overlay.addEventListener('click', closeSidebar);
 }
 
-// CORRECCIÓN AQUÍ: Evita que las categorías principales del menú cierren el sidebar en celular
+// Evita que las categorías principales del menú cierren el sidebar en celular
 document.querySelectorAll('.nav-btn, .nav-sub-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         // Verificamos si el botón presionado abre un acordeón secundario
@@ -93,7 +93,8 @@ function limpiarPantalla() {
 document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]').forEach(btn => {
     btn.addEventListener('click', () => {
         const tema = btn.dataset.tema;
-        if (tema) {
+        // CORRECCIÓN: Ignora "Glosario" aquí para evitar que falle al buscarlo en window.temas
+        if (tema && tema !== "Glosario") {
             limpiarPantalla();
             cargarTema(tema);
         }
@@ -112,9 +113,9 @@ function cargarTema(nombreTema) {
 }
 
 // ============================================================
-//  VISTA DE INICIO (TARJETAS Y MODALES) — CORREGIDO
+//  VISTA DE GLOSARIO (TARJETAS Y MODALES) — CORREGIDO
 // ============================================================
-function cargarVistaInicio() {
+function cargarGlosario() {
     const workspaceContainer = document.getElementById("workspace-container");
     const gridModulos = document.getElementById("grid-modulos");
     const temaTitulo = document.getElementById("tema-titulo");
@@ -123,8 +124,8 @@ function cargarVistaInicio() {
     if (workspaceContainer) workspaceContainer.innerHTML = "";
     if (temaTitulo) {
         temaTitulo.innerHTML = `
-            <h2 class="fw-bold text-white mb-1">Módulos de Áreas Temáticas</h2>
-            <p class="text-muted small mb-4">Explora las estructuras algorítmicas esenciales y pon a prueba tu abstracción modular.</p>
+            <h2 class="fw-bold text-white mb-1">Glosario de Conceptos</h2>
+            <p class="text-muted small mb-4">Selecciona un área temática para revisar sus definiciones, casos prácticos y conclusiones analógicas.</p>
         `;
     }
     if (temaDescripcion) temaDescripcion.style.display = "none";
@@ -187,22 +188,45 @@ function cargarVistaInicio() {
                         </div>
                     </div>
                     <h4 class="text-white fw-bold mb-1">Recursividad</h4>
-                    <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre funciones que dividen un problema llamándose a sí mismas.</p>
+                    <p class="text-white small flex-grow-1 m-0 mt-2">Conceptos generales sobre funciones que dividen un problem llamándose a sí mismas.</p>
                 </button>
             </div>
         `;
     }
 }
 
+// ============================================================
+//  GESTIÓN DE EVENTOS DOM
+// ============================================================
 document.addEventListener("DOMContentLoaded", () => {
     const btnInicio = document.getElementById("btn-inicio");
+    const btnGlosario = document.getElementById("btn-glosario");
+
+    // Evento para el botón Inicio
     if (btnInicio) {
         btnInicio.addEventListener("click", () => {
             limpiarPantalla();
-            cargarVistaInicio();
+            const temaTitulo = document.getElementById("tema-titulo");
+            if (temaTitulo) {
+                temaTitulo.innerHTML = `
+                    <h2 class="fw-bold text-white mb-1">Bienvenido al Intérprete de C#</h2>
+                    <p class="text-muted small">Selecciona una opción del menú lateral para comenzar.</p>
+                `;
+            }
         });
     }
-    cargarVistaInicio();
+
+    // Evento para el botón Glosario
+    if (btnGlosario) {
+        btnGlosario.addEventListener("click", (e) => {
+            e.stopPropagation(); 
+            limpiarPantalla();
+            cargarGlosario();
+        });
+    }
+
+    // Carga inicial por defecto: Pantalla de Inicio vacía
+    if (btnInicio) btnInicio.click();
 });
 
 // ============================================================
@@ -220,7 +244,7 @@ const diccionarioTemas = {
         titulo: "Ciclos",
         concepto: "Los ciclos permiten ejecutar un bloque de instrucciones varias veces mientras se cumpla una condición o hasta alcanzar un número determinado de repeticiones.",
         ejemplos: "for, while, do-while",
-        caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo. Le dices a la computadora: 'Empieza con un contador en 1, muéstralo en pantalla, súmale 1 a ese contador y repite el proceso'. La máquina repetirá la instrucción de forma automática vuelta tras vuelta y se detendrá inmediatamente cuando el contador llegue a 11, logrando mostrar la lista en un instante.\"",
+        caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo. Le dices a la computadora: 'Empieza con un contador en 1, muwstralo en pantalla, súmale 1 a ese contador y repite el proceso'. La máquina repetirá la instrucción de forma automática vuelta tras vuelta y se detendrá inmediatamente cuando el contador llegue a 11, logrando mostrar la lista en un instante.\"",
         conclusion: "Los ciclos nos evitan el trabajo aburrido de duplicar código manualmente. Nos permiten procesar tareas repetitivas de forma automática, exacta y en fracciones de segundo."
     },
     "Array_unidimensional": {
@@ -234,7 +258,7 @@ const diccionarioTemas = {
         titulo: "Arreglos Bidimensionales",
         concepto: "Un arreglo bidimensional organiza los datos en filas y columnas, similar a una tabla o matriz.",
         ejemplos: "Matrices, Tablas de datos, Cuadrículas",
-        caso: "\"Imagina que ahora no quieres registrar las notas de un solo alumno, sino las calificaciones de varios alumnos de un grupo. Para esto usas una cuadrícula tipo Excel: cada fila representa a un estudiante diferente (Alumno 0, Alumno 1, Alumno 2) and cada columna representa una materia distinta (Matemáticas en Columna 0, Historia en Columna 1). Si el programa quiere revisar la nota de Historia del segundo alumno, va directo a la intersección exacta de la Fila 1, Columna 1.\"",
+        caso: "\"Imagina que ahora no quieres registrar las notas de un solo alumno, sino las calificaciones de varios alumnos de un grupo. Para esto usas una cuadrícula tipo Excel: cada fila representa a un estudiante diferente (Alumno 0, Alumno 1, Alumno 2) y cada columna representa una materia distinta (Matemáticas en Columna 0, Historia en Columna 1). Si el programa quiere revisar la nota de Historia del segundo alumno, va directo a la intersección exacta de la Fila 1, Columna 1.\"",
         conclusion: "Los arreglos bidimensionales son la estructura perfecta cuando los datos tienen relaciones más complejas, permitiéndonos crear mapas, tablas y bases de datos ordenadas en dos dimensiones."
     },
     "Recursividad": {
@@ -246,7 +270,6 @@ const diccionarioTemas = {
     }
 };
 
-// CORRECCIÓN AQUÍ: Inyecta el texto literal de "Ejemplos comunes" en tu ventana flotante
 function abrirConceptoModal(idTema) {
     const modal = document.getElementById('modal-concepto');
     const datos = diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
