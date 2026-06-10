@@ -228,7 +228,7 @@ main {
 }
 
 .nav-btn:hover .nav-icon {
-    filter: brightness(0) saturate(100%) invert(55%) sepia(60%) saturate(400%) hue-rotate(115deg) brightness(95%);
+    filter: brightness(0) invert(1);
     opacity: 1;
 }
 
