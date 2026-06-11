@@ -3,24 +3,24 @@
 // ============================================================
 function mostrarPantallaInicio() {
     const inicio = document.getElementById('pantalla-inicio');
-    const tema   = document.getElementById('seccion-tema');
+    const tema = document.getElementById('seccion-tema');
     if (inicio) inicio.style.display = 'flex';
-    if (tema)   tema.style.display   = 'none';
+    if (tema) tema.style.display = 'none';
 }
 
 function mostrarPantallaTema() {
     const inicio = document.getElementById('pantalla-inicio');
-    const tema   = document.getElementById('seccion-tema');
+    const tema = document.getElementById('seccion-tema');
     if (inicio) inicio.style.display = 'none';
-    if (tema)   tema.style.display   = 'block';
+    if (tema) tema.style.display = 'block';
 }
 
 // ============================================================
 //  SIDEBAR — abrir / cerrar en móvil
 // ============================================================
 const toggleBtn = document.getElementById('sidebarToggle');
-const sidebar   = document.getElementById('sidebar');
-const overlay   = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
 
 function openSidebar() {
     sidebar.classList.add('open');
@@ -41,52 +41,44 @@ if (toggleBtn) toggleBtn.addEventListener('click', () => {
 if (overlay) overlay.addEventListener('click', closeSidebar);
 
 // ============================================================
-//  SUBMENÚ — acordeón (SOLO botones has-sub)
-//  Maneja únicamente la apertura/cierre del acordeón.
-//  No hace ninguna navegación.
+//  SUBMENÚ — acordeón (SOLO has-sub, solo abre/cierra submenú)
 // ============================================================
+function toggleAcordeon(btn, e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const group = btn.closest('.nav-group');
+    const isOpen = group.classList.contains('open');
+    document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
+    if (!isOpen) group.classList.add('open');
+    // NO navega, NO cierra sidebar
+}
+
 document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // evita que el click suba al listener de navegación
-        const group  = btn.closest('.nav-group');
-        const isOpen = group.classList.contains('open');
-        document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
-        if (!isOpen) group.classList.add('open');
-        // En móvil: NO cerrar el sidebar al abrir/cerrar acordeón
-    });
+    // click para escritorio
+    btn.addEventListener('click', (e) => toggleAcordeon(btn, e));
+    // touchend para móvil — evita el delay de 300ms y el comportamiento de "mantener presionado"
+    btn.addEventListener('touchend', (e) => toggleAcordeon(btn, e), { passive: false });
 });
 
 // ============================================================
-//  NAVEGACIÓN — sub-botones (For, While, If, Switch, etc.)
-//  Solo estos navegan y cierran el sidebar en móvil.
+//  NAVEGACIÓN — sub-botones finales (For, While, If, etc.)
+//  Excluye has-sub explícitamente
 // ============================================================
-document.querySelectorAll('.nav-sub-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const tema = btn.dataset.tema;
-        if (!tema) return;
-        limpiarPantalla();
-        mostrarPantallaTema();
-        cargarTema(tema);
-        if (window.innerWidth < 768) closeSidebar();
-    });
-});
+function navegarTema(btn, e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const tema = btn.dataset.tema;
+    if (!tema) return;
+    if (tema === 'Glosario') return;
+    limpiarPantalla();
+    mostrarPantallaTema();
+    cargarTema(tema);
+    if (window.innerWidth < 768) closeSidebar();
+}
 
-// ============================================================
-//  NAVEGACIÓN — nav-btn con data-tema pero SIN submenú
-//  (Arreglos, Recursividad, Archivos, Glosario, Inicio)
-// ============================================================
-document.querySelectorAll('.nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const tema = btn.dataset.tema;
-        if (!tema) return;
-        if (tema === 'Glosario') return; // manejado en DOMContentLoaded
-        limpiarPantalla();
-        mostrarPantallaTema();
-        cargarTema(tema);
-        if (window.innerWidth < 768) closeSidebar();
-    });
+document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
+    btn.addEventListener('click', (e) => navegarTema(btn, e));
+    btn.addEventListener('touchend', (e) => navegarTema(btn, e), { passive: false });
 });
 
 // ============================================================
@@ -94,18 +86,18 @@ document.querySelectorAll('.nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
 // ============================================================
 function mostrarDescripcion(titulo, definicion) {
     const elTitulo = document.getElementById('tema-titulo');
-    const elDesc   = document.getElementById('tema-descripcion');
+    const elDesc = document.getElementById('tema-descripcion');
     if (elTitulo) elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
     if (elDesc) {
         if (definicion) { elDesc.innerHTML = definicion; elDesc.style.display = 'block'; }
-        else            { elDesc.innerHTML = '';          elDesc.style.display = 'none';  }
+        else { elDesc.innerHTML = ''; elDesc.style.display = 'none'; }
     }
 }
 
 function limpiarPantalla() {
-    const workspace   = document.getElementById('workspace-container');
+    const workspace = document.getElementById('workspace-container');
     const gridModulos = document.getElementById('grid-modulos');
-    if (workspace)   workspace.innerHTML   = '';
+    if (workspace) workspace.innerHTML = '';
     if (gridModulos) gridModulos.innerHTML = '';
     mostrarDescripcion('', '');
 }
@@ -124,8 +116,8 @@ function cargarGlosario() {
     limpiarPantalla();
     mostrarPantallaTema();
 
-    const temaTitulo  = document.getElementById('tema-titulo');
-    const temaDesc    = document.getElementById('tema-descripcion');
+    const temaTitulo = document.getElementById('tema-titulo');
+    const temaDesc = document.getElementById('tema-descripcion');
     const gridModulos = document.getElementById('grid-modulos');
 
     if (temaTitulo) {
@@ -201,7 +193,7 @@ function cargarGlosario() {
 //  GESTIÓN DE EVENTOS DOM
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-    const btnInicio   = document.getElementById('btn-inicio');
+    const btnInicio = document.getElementById('btn-inicio');
     const btnGlosario = document.getElementById('btn-glosario');
 
     if (btnInicio) {
@@ -230,30 +222,35 @@ const diccionarioTemas = {
     "Selectivas": {
         titulo: "Estructuras Selectivas",
         concepto: "Las estructuras selectivas permiten que un programa tome decisiones dependiendo de si una condición es verdadera o falsa. Se utilizan para controlar el flujo de ejecución y elegir entre diferentes acciones.",
+        ejemplos: "if, if-else, switch",
         caso: "\"Si un alumno tiene promedio mayor o igual a 9, obtiene una beca del 50%; de lo contrario, no recibe beca.\"",
         conclusion: "En pocas palabras, las estructuras selectivas le dan al programa la capacidad de elegir. Sin ellas, las aplicaciones harían siempre exactamente lo mismo, sin importar lo que el usuario necesite."
     },
     "Ciclos": {
         titulo: "Ciclos",
         concepto: "Los ciclos permiten ejecutar un bloque de instrucciones varias veces mientras se cumpla una condición o hasta alcanzar un número determinado de repeticiones.",
+        ejemplos: "for, while, do-while",
         caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo.\"",
         conclusion: "Los ciclos nos evitan el trabajo aburrido de duplicar código manualmente. Nos permiten procesar tareas repetitivas de forma automática, exacta y en fracciones de segundo."
     },
     "Array_unidimensional": {
         titulo: "Arreglos Unidimensionales",
         concepto: "Un arreglo unidimensional es una estructura de datos que almacena varios elementos del mismo tipo en una sola fila de posiciones consecutivas.",
+        ejemplos: "Vectores, Listas Simples, Índices",
         caso: "\"Imagina que necesitas guardar las 5 calificaciones de un alumno. En lugar de crear 5 variables individuales, creas una sola fila de casilleros en la memoria.\"",
         conclusion: "Los arreglos unidimensionales son ideales para manejar listas simples de datos bajo un único nombre, manteniendo la información agrupada, ordenada y fácil de acceder."
     },
     "Array_bidimensional": {
         titulo: "Arreglos Bidimensionales",
         concepto: "Un arreglo bidimensional organiza los datos en filas y columnas, similar a una tabla o matriz.",
+        ejemplos: "Matrices, Tablas de datos, Cuadrículas",
         caso: "\"Imagina que quieres registrar las calificaciones de varios alumnos. Cada fila es un alumno y cada columna es una materia.\"",
         conclusion: "Los arreglos bidimensionales son la estructura perfecta cuando los datos tienen relaciones más complejas, permitiéndonos crear mapas, tablas y bases de datos ordenadas en dos dimensiones."
     },
     "Recursividad": {
         titulo: "Recursividad",
         concepto: "La recursividad es una técnica donde una función se llama a sí misma para resolver un problema dividiéndolo en problemas más pequeños. Toda función recursiva debe tener una condición de parada.",
+        ejemplos: "Caso Base, Caso Recursivo, Pila de Llamadas",
         caso: "\"Para calcular el factorial de 4, la función pide el factorial de 3, que pide el de 2, y así hasta llegar al caso base (1). Luego multiplica de vuelta.\"",
         conclusion: "La recursividad es una forma elegante de programar donde un problema gigante se desarma en piezas idénticas cada vez más pequeñas, solucionándose de adentro hacia afuera."
     }
@@ -264,14 +261,14 @@ function abrirConceptoModal(idTema) {
     const datos = diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
     if (!modal) return;
 
-    document.getElementById('modal-titulo').innerText                 = datos.titulo;
-    document.getElementById('modal-descripcion-texto').innerText      = datos.concepto;
-    document.getElementById('modal-caso-practico').innerText          = datos.caso;
+    document.getElementById('modal-titulo').innerText = datos.titulo;
+    document.getElementById('modal-descripcion-texto').innerText = datos.concepto;
+    document.getElementById('modal-caso-practico').innerText = datos.caso;
     document.getElementById('modal-abstraccion-conclusión').innerText = datos.conclusion;
 
-    const sub  = document.getElementById('modal-subtitulo');
+    const sub = document.getElementById('modal-subtitulo');
     const tema = document.getElementById('modal-tema-nombre');
-    if (sub)  sub.style.display  = 'none';
+    if (sub) sub.style.display = 'none';
     if (tema) tema.style.display = 'none';
 
     modal.showModal();
@@ -284,11 +281,11 @@ function cerrarConceptoModal() {
 
 const modalElemento = document.getElementById('modal-concepto');
 if (modalElemento) {
-    modalElemento.addEventListener('click', function(event) {
+    modalElemento.addEventListener('click', function (event) {
         const rect = this.getBoundingClientRect();
         const clicFuera = (
             event.clientX < rect.left || event.clientX > rect.right ||
-            event.clientY < rect.top  || event.clientY > rect.bottom
+            event.clientY < rect.top || event.clientY > rect.bottom
         );
         if (clicFuera) this.close();
     });
