@@ -3,24 +3,24 @@
 // ============================================================
 function mostrarPantallaInicio() {
     const inicio = document.getElementById('pantalla-inicio');
-    const tema = document.getElementById('seccion-tema');
+    const tema   = document.getElementById('seccion-tema');
     if (inicio) inicio.style.display = 'flex';
-    if (tema) tema.style.display = 'none';
+    if (tema)   tema.style.display   = 'none';
 }
 
 function mostrarPantallaTema() {
     const inicio = document.getElementById('pantalla-inicio');
-    const tema = document.getElementById('seccion-tema');
+    const tema   = document.getElementById('seccion-tema');
     if (inicio) inicio.style.display = 'none';
-    if (tema) tema.style.display = 'block';
+    if (tema)   tema.style.display   = 'block';
 }
 
 // ============================================================
 //  SIDEBAR — abrir / cerrar en móvil
 // ============================================================
 const toggleBtn = document.getElementById('sidebarToggle');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
+const sidebar   = document.getElementById('sidebar');
+const overlay   = document.getElementById('sidebarOverlay');
 
 function openSidebar() {
     sidebar.classList.add('open');
@@ -46,7 +46,7 @@ if (overlay) overlay.addEventListener('click', closeSidebar);
 function toggleAcordeon(btn, e) {
     e.stopPropagation();
     e.preventDefault();
-    const group = btn.closest('.nav-group');
+    const group  = btn.closest('.nav-group');
     const isOpen = group.classList.contains('open');
     document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
     if (!isOpen) group.classList.add('open');
@@ -77,7 +77,7 @@ function navegarTema(btn, e) {
 }
 
 document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
-    btn.addEventListener('click', (e) => navegarTema(btn, e));
+    btn.addEventListener('click',    (e) => navegarTema(btn, e));
     btn.addEventListener('touchend', (e) => navegarTema(btn, e), { passive: false });
 });
 
@@ -86,18 +86,18 @@ document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]:not(.has-sub)').for
 // ============================================================
 function mostrarDescripcion(titulo, definicion) {
     const elTitulo = document.getElementById('tema-titulo');
-    const elDesc = document.getElementById('tema-descripcion');
+    const elDesc   = document.getElementById('tema-descripcion');
     if (elTitulo) elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
     if (elDesc) {
         if (definicion) { elDesc.innerHTML = definicion; elDesc.style.display = 'block'; }
-        else { elDesc.innerHTML = ''; elDesc.style.display = 'none'; }
+        else            { elDesc.innerHTML = '';          elDesc.style.display = 'none';  }
     }
 }
 
 function limpiarPantalla() {
-    const workspace = document.getElementById('workspace-container');
+    const workspace   = document.getElementById('workspace-container');
     const gridModulos = document.getElementById('grid-modulos');
-    if (workspace) workspace.innerHTML = '';
+    if (workspace)   workspace.innerHTML   = '';
     if (gridModulos) gridModulos.innerHTML = '';
     mostrarDescripcion('', '');
 }
@@ -116,8 +116,8 @@ function cargarGlosario() {
     limpiarPantalla();
     mostrarPantallaTema();
 
-    const temaTitulo = document.getElementById('tema-titulo');
-    const temaDesc = document.getElementById('tema-descripcion');
+    const temaTitulo  = document.getElementById('tema-titulo');
+    const temaDesc    = document.getElementById('tema-descripcion');
     const gridModulos = document.getElementById('grid-modulos');
 
     if (temaTitulo) {
@@ -193,23 +193,29 @@ function cargarGlosario() {
 //  GESTIÓN DE EVENTOS DOM
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-    const btnInicio = document.getElementById('btn-inicio');
+    const btnInicio   = document.getElementById('btn-inicio');
     const btnGlosario = document.getElementById('btn-glosario');
 
     if (btnInicio) {
-        btnInicio.addEventListener('click', (e) => {
+        const accionInicio = (e) => {
             e.stopPropagation();
+            e.preventDefault();
             mostrarPantallaInicio();
             if (window.innerWidth < 768) closeSidebar();
-        });
+        };
+        btnInicio.addEventListener('click',    accionInicio);
+        btnInicio.addEventListener('touchend', accionInicio, { passive: false });
     }
 
     if (btnGlosario) {
-        btnGlosario.addEventListener('click', (e) => {
+        const accionGlosario = (e) => {
             e.stopPropagation();
+            e.preventDefault();
             cargarGlosario();
             if (window.innerWidth < 768) closeSidebar();
-        });
+        };
+        btnGlosario.addEventListener('click',    accionGlosario);
+        btnGlosario.addEventListener('touchend', accionGlosario, { passive: false });
     }
 
     mostrarPantallaInicio();
@@ -261,14 +267,14 @@ function abrirConceptoModal(idTema) {
     const datos = diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
     if (!modal) return;
 
-    document.getElementById('modal-titulo').innerText = datos.titulo;
-    document.getElementById('modal-descripcion-texto').innerText = datos.concepto;
-    document.getElementById('modal-caso-practico').innerText = datos.caso;
+    document.getElementById('modal-titulo').innerText                 = datos.titulo;
+    document.getElementById('modal-descripcion-texto').innerText      = datos.concepto;
+    document.getElementById('modal-caso-practico').innerText          = datos.caso;
     document.getElementById('modal-abstraccion-conclusión').innerText = datos.conclusion;
 
-    const sub = document.getElementById('modal-subtitulo');
+    const sub  = document.getElementById('modal-subtitulo');
     const tema = document.getElementById('modal-tema-nombre');
-    if (sub) sub.style.display = 'none';
+    if (sub)  sub.style.display  = 'none';
     if (tema) tema.style.display = 'none';
 
     modal.showModal();
@@ -281,11 +287,11 @@ function cerrarConceptoModal() {
 
 const modalElemento = document.getElementById('modal-concepto');
 if (modalElemento) {
-    modalElemento.addEventListener('click', function (event) {
+    modalElemento.addEventListener('click', function(event) {
         const rect = this.getBoundingClientRect();
         const clicFuera = (
             event.clientX < rect.left || event.clientX > rect.right ||
-            event.clientY < rect.top || event.clientY > rect.bottom
+            event.clientY < rect.top  || event.clientY > rect.bottom
         );
         if (clicFuera) this.close();
     });
