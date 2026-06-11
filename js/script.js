@@ -40,9 +40,12 @@ if (toggleBtn) toggleBtn.addEventListener('click', () => {
 
 if (overlay) overlay.addEventListener('click', closeSidebar);
 
+// Solo cerrar el sidebar en móvil cuando es un destino final,
+// NO cuando es un botón con submenú (Ciclos, Selectivas)
 document.querySelectorAll('.nav-btn, .nav-sub-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        if (window.innerWidth < 768 && !btn.classList.contains('has-sub')) {
+        const tieneSubmenu = btn.classList.contains('has-sub');
+        if (window.innerWidth < 768 && !tieneSubmenu) {
             closeSidebar();
         }
     });
@@ -90,12 +93,8 @@ document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]').forEach(btn => {
         const tema = btn.dataset.tema;
         if (!tema) return;
 
-        if (tema === 'Glosario') {
-            // Glosario → se maneja por su propio listener abajo
-            return;
-        }
+        if (tema === 'Glosario') return; // manejado por su propio listener
 
-        // Cualquier otro tema → mostrar sección de tema
         limpiarPantalla();
         mostrarPantallaTema();
         cargarTema(tema);
@@ -116,8 +115,8 @@ function cargarGlosario() {
     limpiarPantalla();
     mostrarPantallaTema();
 
-    const temaTitulo = document.getElementById('tema-titulo');
-    const temaDesc   = document.getElementById('tema-descripcion');
+    const temaTitulo  = document.getElementById('tema-titulo');
+    const temaDesc    = document.getElementById('tema-descripcion');
     const gridModulos = document.getElementById('grid-modulos');
 
     if (temaTitulo) {
@@ -196,14 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnInicio   = document.getElementById('btn-inicio');
     const btnGlosario = document.getElementById('btn-glosario');
 
-    // Botón Inicio → volver a la pantalla de inicio
     if (btnInicio) {
         btnInicio.addEventListener('click', () => {
             mostrarPantallaInicio();
         });
     }
 
-    // Botón Glosario → cargar vista glosario en seccion-tema
     if (btnGlosario) {
         btnGlosario.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -211,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Arrancar mostrando la pantalla de inicio (sin limpiar ni tocar seccion-tema)
     mostrarPantallaInicio();
 });
 
@@ -261,9 +257,9 @@ function abrirConceptoModal(idTema) {
     const datos = diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
     if (!modal) return;
 
-    document.getElementById('modal-titulo').innerText             = datos.titulo;
-    document.getElementById('modal-descripcion-texto').innerText  = datos.concepto;
-    document.getElementById('modal-caso-practico').innerText      = datos.caso;
+    document.getElementById('modal-titulo').innerText                 = datos.titulo;
+    document.getElementById('modal-descripcion-texto').innerText      = datos.concepto;
+    document.getElementById('modal-caso-practico').innerText          = datos.caso;
     document.getElementById('modal-abstraccion-conclusión').innerText = datos.conclusion;
 
     const sub  = document.getElementById('modal-subtitulo');

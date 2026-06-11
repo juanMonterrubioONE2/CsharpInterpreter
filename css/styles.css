@@ -100,8 +100,8 @@ main {
 .app-sidebar:hover {
     width: var(--sidebar-expanded);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
-    overflow-y: auto;
-    scrollbar-width: thin;
+    overflow: hidden;    /* ← antes: overflow-y: auto */
+    scrollbar-width: none;
     padding: 10px;
 }
 
@@ -841,4 +841,117 @@ section {
 pre {
     margin: 0;
     font-family: monospace;
+}
+
+/* ── PANTALLA DE INICIO ── */
+#pantalla-inicio {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-y: auto;
+}
+
+/* Hero */
+.hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    padding: 70px 60px 60px 60px;
+    border-bottom: 1px solid #2a2d3a;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        grid-template-columns: 1fr;
+        padding: 40px 24px;
+        gap: 40px;
+    }
+}
+
+.hero-left h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 16px;
+}
+
+.hero-left h2 span {
+    color: var(--green-main);
+}
+
+.hero-left p {
+    color: #8a9ab5;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 0;
+    max-width: 480px;
+}
+
+/* Stats hero derecha */
+.hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-left: 40px;
+    border-left: 2px solid #2a2d3a;
+}
+
+@media (max-width: 900px) {
+    .hero-stats {
+        border-left: none;
+        border-top: 2px solid #2a2d3a;
+        padding-left: 0;
+        padding-top: 30px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}
+
+.stat-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.stat-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--white);
+    white-space: nowrap;
+}
+
+.stat-num span {
+    color: var(--green-main);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #8a9ab5;
+}
+
+/* ── SECCIÓN GLOSARIO EN INICIO ── */
+.inicio-glosario {
+    padding: 60px 60px;
+}
+
+@media (max-width: 900px) {
+    .inicio-glosario {
+        padding: 40px 24px;
+    }
+}
+
+.inicio-glosario h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+}
+
+.inicio-glosario .sub {
+    color: #8a9ab5;
+    font-size: 0.9rem;
+    margin-bottom: 36px;
 }
