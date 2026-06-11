@@ -40,27 +40,52 @@ if (toggleBtn) toggleBtn.addEventListener('click', () => {
 
 if (overlay) overlay.addEventListener('click', closeSidebar);
 
-// Solo cerrar el sidebar en móvil cuando es un destino final,
-// NO cuando es un botón con submenú (Ciclos, Selectivas)
-document.querySelectorAll('.nav-btn, .nav-sub-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tieneSubmenu = btn.classList.contains('has-sub');
-        if (window.innerWidth < 768 && !tieneSubmenu) {
-            closeSidebar();
-        }
-    });
-});
-
 // ============================================================
-//  SUBMENÚ — acordeón al hacer click
+//  SUBMENÚ — acordeón (SOLO botones has-sub)
+//  Maneja únicamente la apertura/cierre del acordeón.
+//  No hace ninguna navegación.
 // ============================================================
 document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
     btn.addEventListener('click', (e) => {
-        e.stopPropagation();
+        e.stopPropagation(); // evita que el click suba al listener de navegación
         const group  = btn.closest('.nav-group');
         const isOpen = group.classList.contains('open');
         document.querySelectorAll('.nav-group.open').forEach(g => g.classList.remove('open'));
         if (!isOpen) group.classList.add('open');
+        // En móvil: NO cerrar el sidebar al abrir/cerrar acordeón
+    });
+});
+
+// ============================================================
+//  NAVEGACIÓN — sub-botones (For, While, If, Switch, etc.)
+//  Solo estos navegan y cierran el sidebar en móvil.
+// ============================================================
+document.querySelectorAll('.nav-sub-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tema = btn.dataset.tema;
+        if (!tema) return;
+        limpiarPantalla();
+        mostrarPantallaTema();
+        cargarTema(tema);
+        if (window.innerWidth < 768) closeSidebar();
+    });
+});
+
+// ============================================================
+//  NAVEGACIÓN — nav-btn con data-tema pero SIN submenú
+//  (Arreglos, Recursividad, Archivos, Glosario, Inicio)
+// ============================================================
+document.querySelectorAll('.nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tema = btn.dataset.tema;
+        if (!tema) return;
+        if (tema === 'Glosario') return; // manejado en DOMContentLoaded
+        limpiarPantalla();
+        mostrarPantallaTema();
+        cargarTema(tema);
+        if (window.innerWidth < 768) closeSidebar();
     });
 });
 
@@ -84,22 +109,6 @@ function limpiarPantalla() {
     if (gridModulos) gridModulos.innerHTML = '';
     mostrarDescripcion('', '');
 }
-
-// ============================================================
-//  NAVEGACIÓN — cargar tema al hacer click en sidebar
-// ============================================================
-document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const tema = btn.dataset.tema;
-        if (!tema) return;
-
-        if (tema === 'Glosario') return; // manejado por su propio listener
-
-        limpiarPantalla();
-        mostrarPantallaTema();
-        cargarTema(tema);
-    });
-});
 
 function cargarTema(nombreTema) {
     if (!window.temas || !window.temas[nombreTema]) return;
@@ -196,8 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnGlosario = document.getElementById('btn-glosario');
 
     if (btnInicio) {
-        btnInicio.addEventListener('click', () => {
+        btnInicio.addEventListener('click', (e) => {
+            e.stopPropagation();
             mostrarPantallaInicio();
+            if (window.innerWidth < 768) closeSidebar();
         });
     }
 
@@ -205,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGlosario.addEventListener('click', (e) => {
             e.stopPropagation();
             cargarGlosario();
+            if (window.innerWidth < 768) closeSidebar();
         });
     }
 
@@ -218,35 +230,30 @@ const diccionarioTemas = {
     "Selectivas": {
         titulo: "Estructuras Selectivas",
         concepto: "Las estructuras selectivas permiten que un programa tome decisiones dependiendo de si una condición es verdadera o falsa. Se utilizan para controlar el flujo de ejecución y elegir entre diferentes acciones.",
-        ejemplos: "if, if-else, switch",
         caso: "\"Si un alumno tiene promedio mayor o igual a 9, obtiene una beca del 50%; de lo contrario, no recibe beca.\"",
         conclusion: "En pocas palabras, las estructuras selectivas le dan al programa la capacidad de elegir. Sin ellas, las aplicaciones harían siempre exactamente lo mismo, sin importar lo que el usuario necesite."
     },
     "Ciclos": {
         titulo: "Ciclos",
         concepto: "Los ciclos permiten ejecutar un bloque de instrucciones varias veces mientras se cumpla una condición o hasta alcanzar un número determinado de repeticiones.",
-        ejemplos: "for, while, do-while",
         caso: "\"Imagina que necesitas imprimir en pantalla los números del 1 al 10. En lugar de escribir diez líneas de código repetitivas, creas un ciclo.\"",
         conclusion: "Los ciclos nos evitan el trabajo aburrido de duplicar código manualmente. Nos permiten procesar tareas repetitivas de forma automática, exacta y en fracciones de segundo."
     },
     "Array_unidimensional": {
         titulo: "Arreglos Unidimensionales",
         concepto: "Un arreglo unidimensional es una estructura de datos que almacena varios elementos del mismo tipo en una sola fila de posiciones consecutivas.",
-        ejemplos: "Vectores, Listas Simples, Índices",
         caso: "\"Imagina que necesitas guardar las 5 calificaciones de un alumno. En lugar de crear 5 variables individuales, creas una sola fila de casilleros en la memoria.\"",
         conclusion: "Los arreglos unidimensionales son ideales para manejar listas simples de datos bajo un único nombre, manteniendo la información agrupada, ordenada y fácil de acceder."
     },
     "Array_bidimensional": {
         titulo: "Arreglos Bidimensionales",
         concepto: "Un arreglo bidimensional organiza los datos en filas y columnas, similar a una tabla o matriz.",
-        ejemplos: "Matrices, Tablas de datos, Cuadrículas",
         caso: "\"Imagina que quieres registrar las calificaciones de varios alumnos. Cada fila es un alumno y cada columna es una materia.\"",
         conclusion: "Los arreglos bidimensionales son la estructura perfecta cuando los datos tienen relaciones más complejas, permitiéndonos crear mapas, tablas y bases de datos ordenadas en dos dimensiones."
     },
     "Recursividad": {
         titulo: "Recursividad",
         concepto: "La recursividad es una técnica donde una función se llama a sí misma para resolver un problema dividiéndolo en problemas más pequeños. Toda función recursiva debe tener una condición de parada.",
-        ejemplos: "Caso Base, Caso Recursivo, Pila de Llamadas",
         caso: "\"Para calcular el factorial de 4, la función pide el factorial de 3, que pide el de 2, y así hasta llegar al caso base (1). Luego multiplica de vuelta.\"",
         conclusion: "La recursividad es una forma elegante de programar donde un problema gigante se desarma en piezas idénticas cada vez más pequeñas, solucionándose de adentro hacia afuera."
     }
