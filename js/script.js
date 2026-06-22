@@ -125,6 +125,7 @@ function cargarTema(nombreTema) {
     const datos = window.temas[nombreTema];
     mostrarDescripcion(datos.titulo, datos.definicion);
     if (typeof insertarConsolas === 'function') insertarConsolas();
+    history.replaceState(null, '', '#' + nombreTema);
 }
 
 // ============================================================
@@ -217,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnInicio) {
         const hInicio = crearHandler(() => {
             mostrarPantallaInicio();
+            history.replaceState(null, '', location.pathname);
             if (window.innerWidth < 768) closeSidebar();
         });
         btnInicio.addEventListener('touchend', hInicio.touch);
@@ -232,7 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGlosario.addEventListener('click',    hGlosario.click);
     }
 
-    mostrarPantallaInicio();
+    const hashTema = location.hash.slice(1);
+    if (hashTema && window.temas && window.temas[hashTema]) {
+        mostrarPantallaTema();
+        cargarTema(hashTema);
+    } else {
+        mostrarPantallaInicio();
+    }
 });
 
 // ============================================================
