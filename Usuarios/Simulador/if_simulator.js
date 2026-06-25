@@ -2,6 +2,13 @@
 //  Backend/if_simulator.js
 //  Simulador paso a paso para el subtema "if / else if / else"
 //  Se conecta a los paneles del workspace existente (consolas.js)
+//
+//  NUEVO: variables editables.
+//  El editor Monaco queda en modo solo-lectura (readOnly), y los
+//  valores iniciales de las variables (int, string, bool, double...)
+//  se exponen como inputs HTML generados automáticamente a partir
+//  del AST. Cambiar un input reconstruye el código y vuelve a
+//  ejecutar el simulador con el nuevo valor.
 // ============================================================
 
 // ── Utilidades ───────────────────────────────────────────────
@@ -347,12 +354,13 @@ class IfInterp {
 // ── Simulador ─────────────────────────────────────────────────
 
 class IfSimulator {
-    constructor() { this.snap = new IfSnapMgr(); }
+    constructor() { this.snap = new IfSnapMgr(); this.lastAst = null; }
     load(code) {
         this.snap.reset();
         try {
             const tokens = ifTokenize(code);
             const ast    = new IfParser(tokens).parseProgram();
+            this.lastAst = ast;
             const scope  = new IfScope();
             new IfInterp(this.snap, scope).run(ast);
             this.snap.begin();
@@ -389,7 +397,132 @@ let ifDecorations   = [];
 let ifPlayTimer     = null;
 let ifPlaying       = false;
 
-// ── CSS para resaltado de líneas (Monaco decorations) ─────────
+function ifExtraerVariablesEditables(ast) {
+    if (!ast || !ast.body) return [];
+    return ast.body
+        .filter(n => n.type === 'VarDecl' && n.expr && n.expr.type === 'Literal' && n.expr.value !== null)
+        .map(n => ({
+            name: n.name,
+            varType: n.varType,
+            value: n.expr.value,
+            line: n.line
+        }));
+}
+
+// Reconstruye el código fuente completo, sustituyendo SOLO los valores
+// de las variables editables indicadas en "valores" ({ nombre: valor }),
+// sin tocar el resto de la estructura (if/else, prints, etc.).
+function ifReconstruirCodigo(baseCode, variables, valoresNuevos) {
+    const lineas = baseCode.split('\n');
+    for (const v of variables) {
+        const idx = v.line - 1;
+        if (idx < 0 || idx >= lineas.length) continue;
+        const nuevoValor = valoresNuevos[v.name];
+        let valorFormateado;
+        if (typeof v.value === 'string') {
+            valorFormateado = '"' + String(nuevoValor).replace(/"/g, '\\"') + '"';
+        } else if (typeof v.value === 'boolean') {
+            valorFormateado = (nuevoValor === true || nuevoValor === 'true') ? 'true' : 'false';
+        } else {
+            // numérico
+            const num = parseFloat(nuevoValor);
+            valorFormateado = isNaN(num) ? String(v.value) : String(num);
+        }
+        // Reemplaza solo la parte "= ... ;" de esa línea específica, preservando
+        // el tipo, el nombre y la indentación original.
+        const regex = new RegExp('^(\\s*' + v.varType + '\\s+' + v.name + '\\s*=\\s*).*?(;.*)$');
+        lineas[idx] = lineas[idx].replace(regex, (_, antes, despues) => antes + valorFormateado + despues);
+    }
+    return lineas.join('\n');
+}
+
+// Dibuja el panel de inputs encima del editor, uno por cada variable editable.
+// IMPORTANTE: solo reconstruye el HTML si las variables cambiaron (cantidad/nombres/tipos).
+// Si ya existen los mismos inputs, NO se vuelve a tocar el DOM al escribir,
+// para no perder el foco ni la posición del cursor en cada tecla.
+function ifRenderInputsVariables(variables, codigoBase) {
+    const host = document.getElementById('if-vars-editable');
+    if (!host) return;
+
+    if (!variables.length) {
+        host.innerHTML = '';
+        host.style.display = 'none';
+        host.dataset.ifVarsSignature = '';
+        return;
+    }
+    host.style.display = 'flex';
+
+    // "Firma" de las variables actuales: si no cambió, no reconstruimos el HTML.
+    const signature = variables.map(v => v.name + ':' + v.varType).join('|');
+    if (host.dataset.ifVarsSignature === signature) {
+        return; // los inputs ya existen y son los correctos; no tocar el DOM
+    }
+    host.dataset.ifVarsSignature = signature;
+
+    host.innerHTML = variables.map(v => {
+        const tipoInput = (v.varType === 'int' || v.varType === 'double' || v.varType === 'float' || v.varType === 'long') ? 'number' : 'text';
+        let inputHtml;
+        if (v.varType === 'bool') {
+            inputHtml =
+                '<select class="if-var-input" data-var="' + v.name + '">' +
+                    '<option value="true"' + (v.value === true ? ' selected' : '') + '>true</option>' +
+                    '<option value="false"' + (v.value === false ? ' selected' : '') + '>false</option>' +
+                '</select>';
+        } else {
+            inputHtml =
+                '<input class="if-var-input" type="' + tipoInput + '" data-var="' + v.name + '" value="' + ifEscape(String(v.value)) + '"' +
+                (tipoInput === 'number' && v.varType !== 'int' && v.varType !== 'long' ? ' step="0.01"' : '') + '>';
+        }
+        return (
+            '<div class="if-var-field">' +
+                '<label>' + ifEscape(v.varType) + ' ' + ifEscape(v.name) + '</label>' +
+                inputHtml +
+            '</div>'
+        );
+    }).join('');
+
+    // Conectar eventos UNA SOLA VEZ (porque el bloque de arriba solo corre
+    // cuando los inputs se crean por primera vez o cambian de tipo/nombre).
+    host.querySelectorAll('.if-var-input').forEach(input => {
+        const evento = input.tagName === 'SELECT' ? 'change' : 'input';
+        input.addEventListener(evento, () => {
+            const valoresNuevos = {};
+            host.querySelectorAll('.if-var-input').forEach(inp => {
+                valoresNuevos[inp.dataset.var] = inp.tagName === 'SELECT' ? (inp.value === 'true') : inp.value;
+            });
+            const nuevoCodigo = ifReconstruirCodigo(codigoBase, variables, valoresNuevos);
+            if (ifMonacoEditor) ifMonacoEditor.setValue(nuevoCodigo);
+            ifEjecutarSinTocarInputs(nuevoCodigo, variables);
+        });
+    });
+}
+
+// Variante de ejecución que NO vuelve a dibujar el panel de inputs
+// (evita el problema de perder el foco mientras el usuario escribe).
+function ifEjecutarSinTocarInputs(codigo) {
+    const first = ifSim.load(codigo);
+    ifRender(first, ifSim.info());
+
+    const btns = document.querySelectorAll('.editor-controls .ctrl-btn');
+    if (btns[1]) btns[1].disabled = true;
+    if (btns[3]) { ifPlaying = false; btns[3].textContent = 'Reproducir'; }
+}
+
+// Carga el código en el simulador, detecta variables editables, dibuja
+// sus inputs, y muestra el primer paso. Se usa tanto al inicializar
+// como cada vez que el usuario cambia un valor.
+function ifCargarYEjecutar(codigo) {
+    const first = ifSim.load(codigo);
+    const variables = ifExtraerVariablesEditables(ifSim.lastAst);
+    ifRenderInputsVariables(variables, codigo);
+    ifRender(first, ifSim.info());
+
+    const btns = document.querySelectorAll('.editor-controls .ctrl-btn');
+    if (btns[1]) btns[1].disabled = true;
+    if (btns[3]) { ifPlaying = false; btns[3].textContent = 'Reproducir'; }
+}
+
+// ── CSS para resaltado de líneas (Monaco decorations) + panel de variables ─
 
 (function injectIfStyles() {
     if (document.getElementById('if-simulator-styles')) return;
@@ -408,6 +541,23 @@ let ifPlaying       = false;
         .if-speed-row label { font-size:0.78em; color:#8a9ab5; white-space:nowrap; }
         .if-speed-row input[type=range] { flex:1; accent-color:#04AA6D; cursor:pointer; height:4px; }
         .if-speed-val  { font-size:0.78em; color:#04AA6D; min-width:30px; text-align:right; }
+
+        #if-vars-editable {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            padding: 10px 14px; margin-bottom: 8px;
+            background: #1e2130; border: 1px solid #3a3d4a; border-radius: 8px;
+        }
+        .if-var-field { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .if-var-field label {
+            font-size: 0.72em; color: #8a9ab5; font-family: monospace;
+            text-transform: none; letter-spacing: 0.02em;
+        }
+        .if-var-input {
+            background: #15161e; border: 1px solid #3a3d4a; color: #fff;
+            padding: 6px 10px; border-radius: 6px; font-family: 'Consolas', monospace;
+            font-size: 0.9em; outline: none; transition: border-color 0.15s;
+        }
+        .if-var-input:focus { border-color: #04AA6D; }
     `;
     document.head.appendChild(style);
 })();
@@ -418,7 +568,6 @@ function ifRender(state, info) {
     if (!state) { ifClearPanels(); return; }
     ifHighlight(state.line, state.status);
 
-    // Panel paso actual
     const panelPaso = document.getElementById('panel-paso');
     if (panelPaso) {
         const src = ifMonacoEditor
@@ -430,7 +579,6 @@ function ifRender(state, info) {
             (state.note ? '<div class="if-note' + noteClass + '">' + ifEscape(state.note) + '</div>' : '');
     }
 
-    // Panel variables
     const panelVars = document.getElementById('panel-vars');
     if (panelVars) {
         const entries = Object.entries(state.variables || {});
@@ -439,13 +587,11 @@ function ifRender(state, info) {
             : '<span style="color:#8a9ab5;font-size:0.85em;">Sin variables</span>';
     }
 
-    // Panel salida
     const panelSalida = document.getElementById('panel-salida');
     if (panelSalida) {
         panelSalida.textContent = (state.output || []).join('\n');
     }
 
-    // Contador de pasos
     if (info && info.total > 0) {
         const stepEl = document.querySelector('.ctrl-step');
         if (stepEl) stepEl.textContent = 'Paso ' + (info.index + 1) + ' / ' + info.total;
@@ -480,7 +626,13 @@ function initIfSimulator() {
     const editorBody = document.getElementById('editor-body');
     if (!editorBody) return;
 
-    // Carga Monaco y crea el editor
+    // Inserta el contenedor de inputs editables justo ANTES del editor
+    if (!document.getElementById('if-vars-editable')) {
+        const varsHost = document.createElement('div');
+        varsHost.id = 'if-vars-editable';
+        editorBody.parentNode.insertBefore(varsHost, editorBody);
+    }
+
     function crearEditor() {
         require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
         require(['vs/editor/editor.main'], function () {
@@ -491,13 +643,15 @@ function initIfSimulator() {
                 automaticLayout: true,
                 fontSize: 14,
                 minimap: { enabled: false },
-                scrollBeyondLastLine: false
+                scrollBeyondLastLine: false,
+                readOnly: true   // ← BLOQUEA toda edición directa de la estructura del código
             });
             conectarBotones();
+            // Carga inicial: detecta variables y dibuja sus inputs
+            ifCargarYEjecutar(IF_EXAMPLE);
         });
     }
 
-    // Si Monaco ya está cargado, úsalo directo; si no, carga el loader
     if (window.monaco) {
         crearEditor();
     } else {
@@ -513,7 +667,6 @@ function initIfSimulator() {
 function ifGetDelay() {
     const slider = document.getElementById('if-speed-slider');
     const val = slider ? parseInt(slider.value) : 40;
-    // val 1-100: mayor valor = más rápido = menor delay (2000ms → 200ms)
     return Math.round(2000 - (val / 100) * 1800);
 }
 
@@ -539,18 +692,15 @@ function ifAutoPlay(btns) {
 // ── Conexión de botones ───────────────────────────────────────
 
 function conectarBotones() {
-    // Botones del editor-controls: Reiniciar[0], Anterior[1], Siguiente[2], Reproducir[3]
     const btns = document.querySelectorAll('.editor-controls .ctrl-btn');
 
-    // Reiniciar
+    // Reiniciar: vuelve al código de ejemplo original
     if (btns[0]) btns[0].onclick = () => {
         ifStopPlay(btns);
-        ifSim.clear();
-        ifClearPanels();
-        if (btns[1]) btns[1].disabled = true;
+        if (ifMonacoEditor) ifMonacoEditor.setValue(IF_EXAMPLE);
+        ifCargarYEjecutar(IF_EXAMPLE);
     };
 
-    // Anterior
     if (btns[1]) {
         btns[1].disabled = true;
         btns[1].onclick = () => {
@@ -561,7 +711,6 @@ function conectarBotones() {
         };
     }
 
-    // Siguiente
     if (btns[2]) btns[2].onclick = () => {
         ifStopPlay(btns);
         const state = ifSim.next();
@@ -569,14 +718,11 @@ function conectarBotones() {
         if (btns[1]) btns[1].disabled = false;
     };
 
-    // Reproducir / Pausar (toggle)
     if (btns[3]) btns[3].onclick = () => {
         if (ifPlaying) {
-            // Pausar
             ifStopPlay(btns);
             return;
         }
-        // Si no hay pasos cargados, compilar primero
         if (ifSim.info().total === 0) {
             const first = ifSim.load(ifMonacoEditor.getValue());
             if (!first || first.status === 'err') {
@@ -586,13 +732,11 @@ function conectarBotones() {
             ifRender(first, ifSim.info());
             if (btns[1]) btns[1].disabled = true;
         }
-        // Iniciar reproducción automática
         ifPlaying = true;
         btns[3].textContent = 'Pausar';
         ifPlayTimer = setTimeout(() => ifAutoPlay(btns), ifGetDelay());
     };
 
-    // Inyectar barra de velocidad debajo de los controles
     const controls = document.querySelector('.editor-controls');
     if (controls && !document.getElementById('if-speed-slider')) {
         const speedRow = document.createElement('div');
@@ -606,7 +750,6 @@ function conectarBotones() {
         const slider = document.getElementById('if-speed-slider');
         const valLbl = document.getElementById('if-speed-val');
         slider.addEventListener('input', () => {
-            // Mostrar velocidad relativa: slider 40 = 1×, 1 = 0.1×, 100 = 2.5×
             const mult = (parseFloat(slider.value) / 40).toFixed(1);
             valLbl.textContent = mult + '×';
         });
@@ -618,7 +761,6 @@ function conectarBotones() {
 (function () {
     const _cargarTema = window.cargarTema;
     window.cargarTema = function (nombreTema) {
-        // Detener reproducción y destruir editor anterior si existe
         ifStopPlay(null);
         if (ifMonacoEditor) {
             ifMonacoEditor.dispose();
