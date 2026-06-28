@@ -1,3 +1,5 @@
+/* Admin.css */
+
 :root {
     --dark: #282A35;
     --green-main: #04AA6D;
@@ -19,6 +21,7 @@
     --sidebar-expanded: 260px;
     --sidebar-transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     --header-h: 60px;
+    --footer-h: 45px;
 }
 
 * {
@@ -32,27 +35,32 @@ body {
     height: 100%
 }
 
+/* ================= BODY — columna flex igual que la app ================= */
 body {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
-    -webkit-font-smoothing: antialiased
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+    /* el body NO scrollea */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-/* ── Header ── */
+/* ================= HEADER — ahora es item flex, NO fixed ================= */
 .app-header {
     background-color: var(--dark);
-    height: var(--header-h);
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 18px;
+    padding: 6px 18px;
     color: var(--white);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 40;
+    flex-shrink: 0;
+    /* nunca se encoge */
+    z-index: 100;
     border-bottom: 1px solid var(--console-border);
 }
 
@@ -68,9 +76,11 @@ body {
 }
 
 .app-header h1 {
+    color: var(--white);
     font-size: 1.15rem;
     font-weight: 700;
-    letter-spacing: .3px
+    letter-spacing: .3px;
+    margin: 0;
 }
 
 .app-header .tag {
@@ -111,88 +121,209 @@ body {
     font-size: .7rem
 }
 
-/* ── Layout ── */
+/* ================= LAYOUT — flex igual que la app ================= */
 .layout {
+    flex: 1;
+    /* ocupa todo el espacio bajo el header */
     display: flex;
-    padding-top: var(--header-h)
+    overflow: hidden;
+    min-height: 0;
 }
 
-/* ── Sidebar (idéntico a la app) ── */
+/* ================= MAIN — el único que scrollea ================= */
+.main {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
+    padding: 26px 30px 60px;
+}
+
+/* ============================================================
+   SIDEBAR — copiado de styles.css (idéntico a la app)
+   ============================================================ */
 .app-sidebar {
     background-color: var(--dark);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
     width: var(--sidebar-collapsed);
-    min-height: calc(100vh - var(--header-h));
+    flex-shrink: 0;
     overflow: hidden;
     transition: width var(--sidebar-transition);
-    position: fixed;
-    top: var(--header-h);
-    left: 0;
-    bottom: 0;
-    z-index: 30;
-    padding: 14px 0;
+    z-index: 50;
+    scrollbar-width: none;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    align-self: stretch;
 }
 
-.app-sidebar:hover {
-    width: var(--sidebar-expanded);
-    overflow-y: auto
+.app-sidebar::-webkit-scrollbar {
+    display: none;
 }
 
+/* Título MENÚ */
 .app-sidebar h4 {
-    color: var(--text-mut);
-    font-size: .7rem;
+    color: #bfc6d1;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: .12em;
-    padding: 0 26px 10px;
+    margin-bottom: 20px;
+    white-space: nowrap;
     opacity: 0;
     transition: opacity var(--sidebar-transition);
-    white-space: nowrap
+    padding-top: 8px;
+    padding-left: 6px;
 }
 
-.app-sidebar:hover h4 {
-    opacity: 1
+/* Indicador verde */
+.app-sidebar::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 36px;
+    background: var(--green-main);
+    border-radius: 2px 0 0 2px;
+    opacity: 0.5;
+    transition: opacity var(--sidebar-transition), height var(--sidebar-transition);
 }
 
+/* ============================================================
+   EXPANSIÓN POR HOVER — SOLO ESCRITORIO CON MOUSE REAL
+   ============================================================ */
+@media (hover: hover) and (pointer: fine) {
+    .app-sidebar:hover {
+        width: var(--sidebar-expanded);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+        overflow: hidden;
+        scrollbar-width: none;
+        padding: 10px;
+    }
+
+    .app-sidebar:hover::-webkit-scrollbar {
+        display: block;
+        width: 4px;
+    }
+
+    .app-sidebar:hover::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .app-sidebar:hover::-webkit-scrollbar-thumb {
+        background: #3B4252;
+        border-radius: 4px;
+    }
+
+    .app-sidebar:hover h4 {
+        opacity: 1;
+    }
+
+    .app-sidebar:hover::after {
+        opacity: 0;
+        height: 0;
+    }
+
+    .app-sidebar:hover .nav-label {
+        opacity: 1;
+    }
+
+    .app-sidebar:hover .nav-arrow {
+        opacity: 1;
+    }
+
+    .nav-btn:hover {
+        background-color: var(--green-main);
+        color: var(--white);
+    }
+
+    .nav-btn:hover .nav-icon {
+        filter: brightness(0) invert(1);
+        opacity: 1;
+    }
+
+    .nav-group:hover .nav-arrow {
+        transform: rotate(180deg);
+        color: var(--green-main);
+    }
+
+    .app-sidebar:hover .nav-group:hover .nav-sub {
+        max-height: 200px;
+        opacity: 1;
+    }
+
+    .app-sidebar:hover .nav-group.open .nav-sub {
+        max-height: 200px;
+        opacity: 1;
+    }
+
+    .nav-sub-btn:hover {
+        background-color: rgba(4, 170, 109, 0.12);
+        color: var(--green-main);
+        border-left-color: var(--green-main);
+        padding-left: 18px;
+    }
+}
+
+/* ================= BOTONES NAV ================= */
 .nav-btn {
+    width: 100%;
+    padding: 11px 10px;
+    background-color: transparent;
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+    margin-bottom: 6px;
     display: flex;
     align-items: center;
-    width: 100%;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    color: var(--white);
-    padding: 13px 0;
-    font-size: .93rem;
-    font-family: inherit;
-    text-align: left;
-    transition: background .15s;
+    gap: 12px;
     white-space: nowrap;
-    position: relative
+    overflow: hidden;
+    font-family: inherit;
 }
 
-.nav-btn:hover {
-    background-color: var(--green-main)
+.nav-btn:active {
+    transform: scale(0.98);
 }
 
-.nav-btn.active {
-    background-color: var(--green-soft)
+.nav-label {
+    opacity: 0;
+    transition: opacity var(--sidebar-transition);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.nav-btn.active::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--green-main)
+.nav-arrow {
+    font-size: 0.7rem;
+    color: #8a9ab5;
+    transition: transform 0.25s ease, opacity var(--sidebar-transition);
+    flex-shrink: 0;
+    opacity: 0;
 }
 
+/* Estado persistente .open (controlado por JS) */
+.nav-group.open .nav-arrow {
+    transform: rotate(180deg);
+    color: var(--green-main);
+}
+
+.nav-group.open > .nav-btn.has-sub {
+    background-color: rgba(4, 170, 109, 0.18);
+}
+
+/* ================= ÍCONOS ================= */
 .nav-icon {
-    width: var(--sidebar-collapsed);
-    min-width: var(--sidebar-collapsed);
-    display: grid;
-    place-items: center;
-    flex-shrink: 0
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+    opacity: 0.7;
+    transition: opacity 0.2s, filter 0.2s;
 }
 
 .nav-icon svg {
@@ -200,88 +331,192 @@ body {
     height: 21px
 }
 
-.nav-label {
-    opacity: 0;
-    transition: opacity var(--sidebar-transition);
-    flex: 1
-}
-
-.app-sidebar:hover .nav-label {
-    opacity: 1
-}
-
-.nav-arrow {
-    margin-right: 18px;
-    opacity: 0;
-    transition: transform .25s, opacity var(--sidebar-transition);
-    font-size: .7rem
-}
-
-.app-sidebar:hover .nav-arrow {
-    opacity: 1
-}
-
-.nav-group.open .nav-arrow {
-    transform: rotate(180deg);
-    color: var(--green-main)
-}
-
-.nav-group {
+.nav-btn.has-sub {
     display: flex;
-    flex-direction: column
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.nav-btn.has-sub .nav-label {
+    flex: 1;
+}
+
+/* ================= SUBMENÚ ================= */
+.nav-group {
+    margin-bottom: 4px;
 }
 
 .nav-sub {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .28s ease;
-    background: rgba(0, 0, 0, 0.18)
-}
-
-.nav-group.open .nav-sub {
-    max-height: 240px
+    opacity: 0;
+    padding-left: 12px;
+    transition: max-height 0.28s ease, opacity 0.2s ease;
 }
 
 .nav-sub-btn {
-    border: none;
-    background: transparent;
-    color: var(--text-dim);
-    cursor: pointer;
     width: 100%;
+    padding: 9px 14px;
+    background-color: transparent;
+    color: #9aa1b8;
+    border: none;
+    border-left: 2px solid #1a3e1f;
+    border-radius: 0 6px 6px 0;
     text-align: left;
-    padding: 11px 0 11px 80px;
-    font-size: .86rem;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: 0.15s;
+    display: block;
+    margin-bottom: 2px;
     font-family: inherit;
-    border-left: 3px solid transparent;
     white-space: nowrap;
-    transition: .15s;
-    opacity: 0
 }
 
-.app-sidebar:hover .nav-sub-btn {
-    opacity: 1
+.nav-sub-btn:active {
+    transform: scale(0.98);
 }
 
-.nav-sub-btn:hover {
-    color: var(--green-main);
-    border-left-color: var(--green-main);
-    background: rgba(4, 170, 109, 0.06)
+/* ================= RESPONSIVE MÓVIL — botón flotante + overlay ================= */
+.sidebar-toggle {
+    position: fixed;
+    bottom: 70px;
+    left: 16px;
+    z-index: 300;
+    background-color: var(--green-main);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, transform 0.2s;
 }
 
-.nav-sub-btn.active {
-    color: var(--green-main);
-    border-left-color: var(--green-main);
-    font-weight: 600
+.sidebar-toggle:hover {
+    background-color: #038a59;
+    transform: scale(1.08);
 }
 
-/* ── Main ── */
-.main {
-    flex: 1;
-    margin-left: var(--sidebar-collapsed);
-    min-height: calc(100vh - var(--header-h));
-    padding: 26px 30px 60px;
-    min-width: 0
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 150;
 }
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* En escritorio NO se muestran (reemplaza al d-md-none de Bootstrap) */
+@media (min-width: 768px) {
+    .sidebar-toggle,
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body {
+        height: 100dvh;
+    }
+
+    .app-sidebar {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 260px !important;
+        z-index: 200;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease !important;
+        padding: 60px 10px 10px 10px;
+        overflow-y: auto !important;
+        box-shadow: none;
+        align-self: auto;
+    }
+
+    .app-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .app-sidebar .nav-label,
+    .app-sidebar .nav-arrow {
+        opacity: 1;
+    }
+
+    .app-sidebar .nav-group.open .nav-sub {
+        max-height: 200px;
+        opacity: 1;
+    }
+
+    .app-sidebar::after {
+        display: none;
+    }
+
+    body.sidebar-open {
+        overflow: hidden;
+    }
+
+    .main {
+        padding: 16px;
+    }
+
+    .app-header h1 {
+        font-size: 1.05rem;
+    }
+
+    /* Mostrar título y labels cuando el sidebar está abierto */
+    .app-sidebar.open h4 {
+        opacity: 1 !important;
+        padding-top: 0 !important;
+    }
+
+    .app-sidebar.open .nav-label,
+    .app-sidebar.open .nav-arrow {
+        opacity: 1 !important;
+    }
+
+    .nav-btn:active {
+        background-color: var(--green-main) !important;
+        color: var(--white) !important;
+    }
+
+    .nav-sub-btn:active {
+        background-color: rgba(4, 170, 109, 0.25) !important;
+        color: var(--green-main) !important;
+    }
+
+    .app-sidebar .nav-group.open .nav-arrow {
+        transform: rotate(180deg) !important;
+        color: var(--green-main) !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    :root {
+        --sidebar-expanded: 220px;
+    }
+}
+
+@media (min-width: 1400px) {
+    :root {
+        --sidebar-expanded: 300px;
+    }
+}
+
+/* ============================================================
+   ====== DE AQUÍ EN ADELANTE: ESTILOS PROPIOS DEL ADMIN ======
+   ============================================================ */
 
 .page-head {
     display: flex;
