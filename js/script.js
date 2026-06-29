@@ -1,6 +1,4 @@
-// ============================================================
 //  HELPERS — mostrar / ocultar pantallas
-// ============================================================
 function mostrarPantallaInicio() {
     const inicio = document.getElementById('pantalla-inicio');
     const tema = document.getElementById('seccion-tema');
@@ -14,10 +12,7 @@ function mostrarPantallaTema() {
     if (inicio) inicio.style.display = 'none';
     if (tema) tema.style.display = 'block';
 }
-
-// ============================================================
 //  SIDEBAR — abrir / cerrar en móvil
-// ============================================================
 const toggleBtn = document.getElementById('sidebarToggle');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('sidebarOverlay');
@@ -40,9 +35,8 @@ if (toggleBtn) toggleBtn.addEventListener('click', () => {
 
 if (overlay) overlay.addEventListener('click', closeSidebar);
 
-// ============================================================
 //  UTILIDAD — evitar que click y touchend se dupliquen
-// ============================================================
+
 let _touchHandled = false;
 
 function crearHandler(fn) {
@@ -60,10 +54,7 @@ function crearHandler(fn) {
         }
     };
 }
-
-// ============================================================
 //  SUBMENÚ — acordeón
-// ============================================================
 document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
     const fn = () => {
         const group = btn.closest('.nav-group');
@@ -76,9 +67,8 @@ document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
     btn.addEventListener('click',    h.click);
 });
 
-// ============================================================
 //  NAVEGACIÓN — sub-botones finales
-// ============================================================
+
 document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]:not(.has-sub)').forEach(btn => {
     const fn = () => {
         const tema = btn.dataset.tema;
@@ -94,9 +84,7 @@ document.querySelectorAll('.nav-sub-btn, .nav-btn[data-tema]:not(.has-sub)').for
     btn.addEventListener('click',    h.click);
 });
 
-// ============================================================
 //  HELPERS — actualizar título y definición en pantalla
-// ============================================================
 function mostrarDescripcion(titulo, definicion) {
     const elTitulo = document.getElementById('tema-titulo');
     const elDesc = document.getElementById('tema-descripcion');
@@ -123,11 +111,10 @@ function cargarTema(nombreTema) {
     history.replaceState(null, '', '#' + nombreTema);
 }
 
-// ============================================================
-//  TOOLTIPS — palabras técnicas con explicación al pasar el cursor
-//  Uso: tip('palabra', 'explicación corta')
-//  Genera un <span class="glosario-tip"> con data-tip
-// ============================================================
+/* TOOLTIPS — palabras técnicas con explicación al pasar el cursor
+Uso: tip('palabra', 'explicación corta')
+Genera un <span class="glosario-tip"> con data-tip */
+
 function tip(palabra, explicacion) {
     // Las comillas dobles dentro del atributo data-tip rompen el HTML
     // porque cierran el atributo antes de tiempo. Las escapamos a &quot;
@@ -135,9 +122,8 @@ function tip(palabra, explicacion) {
     return `<span class="glosario-tip" data-tip="${textoSeguro}">${palabra}</span>`;
 }
 
-// ============================================================
+
 //  VISTA DE GLOSARIO
-// ============================================================
 const glosarioUnidades = [
     {
         unidad: 'Unidad II — Estructuras de control',
@@ -197,9 +183,7 @@ function cargarGlosario() {
     }
 }
 
-// ============================================================
 //  GESTIÓN DE EVENTOS DOM
-// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     const btnInicio = document.getElementById('btn-inicio');
     const btnGlosario = document.getElementById('btn-glosario');
@@ -289,9 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ============================================================
-//  DICCIONARIO — conceptos generales de la pantalla de inicio
-// ============================================================
+
+//DICCIONARIO
+
 const diccionarioTemas = {
     "Selectivas": {
         titulo: "Estructuras Selectivas",
@@ -515,9 +499,8 @@ const glosarioTerminos = {
     }
 };
 
-// ============================================================
-//  MODAL — abrir con innerHTML para que los tips funcionen
-// ============================================================
+// MODAL — abrir con innerHTML para que los tips funcionen
+
 function abrirConceptoModal(idTema) {
     const modal = document.getElementById('modal-concepto');
     const datos = glosarioTerminos[idTema] || diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];

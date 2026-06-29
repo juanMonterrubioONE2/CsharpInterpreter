@@ -14,7 +14,7 @@
     --footer-h: 45px;
 }
 
-/* ================= BODY ================= */
+/*  BODY  */
 body {
     background-color: #1E1F26;
     height: 100vh;
@@ -28,7 +28,7 @@ body {
     flex-direction: column;
 }
 
-/* ================= HEADER ================= */
+/*  HEADER  */
 header {
     display: flex;
     align-items: center;
@@ -50,7 +50,7 @@ header {
     height: auto;
 }
 
-/* ================= TÍTULOS ================= */
+/*  TÍTULOS  */
 h1 {
     color: var(--white);
     font-family: Arial, Helvetica, sans-serif;
@@ -60,7 +60,7 @@ h1 {
 }
 
 
-/* ================= LAYOUT ================= */
+/*  LAYOUT  */
 .layout {
     flex: 1;
     /* ocupa todo el espacio entre header y footer */
@@ -71,7 +71,7 @@ h1 {
     /* necesario para que flex respete el overflow */
 }
 
-/* ================= MAIN — el único que scrollea ================= */
+/*  MAIN  */
 main {
     flex: 1;
     min-width: 0;
@@ -83,7 +83,7 @@ main {
     flex-direction: column;
 }
 
-/* ================= SIDEBAR — fijo por diseño flex ================= */
+/*  SIDEBAR — fijo por diseño flex  */
 .app-sidebar {
     background-color: var(--dark);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -133,11 +133,11 @@ main {
     transition: opacity var(--sidebar-transition), height var(--sidebar-transition);
 }
 
-/* ============================================================
+/* 
    EXPANSIÓN POR HOVER — SOLO ESCRITORIO CON MOUSE REAL
    El emulador de Edge y los táctiles reportan hover:none,
    así que aquí no se dispara nada por puntero.
-   ============================================================ */
+    */
 @media (hover: hover) and (pointer: fine) {
     .app-sidebar:hover {
         width: var(--sidebar-expanded);
@@ -215,7 +215,7 @@ main {
     }
 }
 
-/* ================= BOTONES NAV ================= */
+/*  BOTONES NAV  */
 .nav-btn {
     width: 100%;
     padding: 11px 10px;
@@ -255,9 +255,9 @@ main {
     opacity: 0;
 }
 
-/* ============================================================
+/* 
    ESTADO PERSISTENTE (controlado por JS con .open) — SIEMPRE activo
-   ============================================================ */
+    */
 .nav-group.open .nav-arrow {
     transform: rotate(180deg);
     color: var(--green-main);
@@ -268,7 +268,7 @@ main {
     background-color: rgba(4, 170, 109, 0.18);
 }
 
-/* ================= ÍCONOS ================= */
+/*  ÍCONOS  */
 .nav-icon {
     width: 20px;
     height: 20px;
@@ -309,7 +309,7 @@ main {
     flex: 1;
 }
 
-/* ================= SUBMENÚ ================= */
+/*  SUBMENÚ  */
 .nav-group {
     margin-bottom: 4px;
 }
@@ -344,7 +344,7 @@ main {
     transform: scale(0.98);
 }
 
-/* ================= FOOTER ================= */
+/*  FOOTER  */
 .app-footer {
     background-color: var(--dark);
     color: var(--white);
@@ -356,7 +356,7 @@ main {
     margin-top: auto;
 }
 
-/* ================= SCROLLBAR GLOBAL ================= */
+/*  SCROLLBAR GLOBAL  */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -374,7 +374,7 @@ main {
     background: #4C566A;
 }
 
-/* ================= RESPONSIVE MÓVIL ================= */
+/*  RESPONSIVE MÓVIL  */
 .sidebar-toggle {
     position: fixed;
     bottom: 70px;
@@ -488,9 +488,9 @@ main {
     }
 }
 
-/* ===============================================
+/* 
    WORKSPACE
-   =============================================== */
+*/
 .workspace {
     display: grid;
     grid-template-columns: 1fr 540px;
@@ -510,9 +510,9 @@ main {
     }
 }
 
-/* ===============================================
-   PANELES BASE
-   =============================================== */
+/*
+   PANELES BASE 
+*/
 .console-panel {
     background-color: var(--dark);
     border-radius: 10px;
@@ -603,9 +603,9 @@ main {
     gap: 6px;
 }
 
-/* ===============================================
-   EDITOR
-   =============================================== */
+/* 
+   EditorR
+    */
 .editor-panel {
     min-height: 50px;
 }
@@ -707,9 +707,9 @@ main {
     gap: 14px;
 }
 
-/* ===============================================
+    /* 
    TEXTO EXPLICATIVO
-   =============================================== */
+    */
 .explanation-text {
     background-color: #1e2130;
     border: 1px solid var(--console-border);
@@ -733,9 +733,8 @@ section {
     margin-bottom: 12px;
 }
 
-/* ===============================================
-   MODALES
-   =============================================== */
+/* Modal */
+
 .custom-modal {
     background-color: var(--dark);
     border: 1px solid var(--console-border);
@@ -868,10 +867,8 @@ section {
     background-color: #7b2cbf;
     border-color: #7b2cbf;
 }
+/* Botones modulares */
 
-/* ===============================================
-   TARJETAS MODULARES
-   =============================================== */
 .modular-card-btn {
     background-color: #282A35 !important;
     border: 1px solid #3a3d4a !important;
@@ -907,7 +904,7 @@ pre {
     font-family: monospace;
 }
 
-/* ── PANTALLA DE INICIO ── */
+/* pantalla de inicio */
 #pantalla-inicio {
     display: none;
     flex-direction: column;
@@ -1093,10 +1090,10 @@ pre {
     margin-bottom: 36px;
 }
 
-/* ===============================================
-   COLORES DE SELECCIÓN EN MÓVIL / TÁCTIL
+
+   /* COLORES DE SELECCIÓN EN MÓVIL / TÁCTIL
    :active y touch feedback para nav-btn y nav-sub-btn
-   =============================================== */
+ */
 
 /* Feedback visual al tocar cualquier botón del sidebar */
 .nav-btn:active,
@@ -1167,9 +1164,7 @@ pre {
 }
 
 
-/* ===============================================
-   BOTONES DE PASOS (ANTERIOR Y SIGUIENTE)
-   =============================================== */
+/* Botones de paso Anterior y siguiente */
 .btn-anterior,
 .btn-siguiente {
     position: relative;
@@ -1249,9 +1244,7 @@ pre {
     opacity: 1;
 }
 
-/* ===============================================
-   BOTÓN REPRODUCIR (PLAY / PAUSE)
-   =============================================== */
+/* Boton de reproduccion play y pause */
 #btn-reproducir {
     position: relative;
     display: inline-flex;
@@ -1309,15 +1302,10 @@ pre {
 }
 
 #btn-reproducir {
-    /* ...lo de arriba... */
     padding: 6px 12px;
     border-radius: 8px;
 }
 
-/* ===============================================
-   GLOSARIO — títulos de unidad
-   Agregar este bloque al FINAL de tu styles.css actual
-   =============================================== */
 .glosario-unidad-titulo {
     font-size: 1.15rem;
     font-weight: 700;
@@ -1327,17 +1315,14 @@ pre {
     border-bottom: 1px solid var(--console-border);
 }
 
-/* ===============================================
-   TOOLTIPS DE GLOSARIO — palabras técnicas en el modal
-   Agrega este bloque al FINAL de tu styles.css
-   =============================================== */
+/* TOOLTIPS DE GLOSARIO */
 
-/* La palabra técnica dentro del texto del modal */
 .glosario-tip {
     font-weight: 700;
     color: var(--green-main);
     border-bottom: 1px dashed var(--green-main);
-    cursor: default;   /* sin signo de interrogación */
+    cursor: default;
+    /* sin signo de interrogación */
     transition: color 0.15s;
 }
 
@@ -1351,7 +1336,8 @@ pre {
 #glosario-tooltip {
     display: none;
     position: fixed;
-    z-index: 2147483647;   /* el máximo posible */
+    z-index: 2147483647;
+    /* el máximo posible */
     background-color: #15161e;
     border: 1px solid var(--console-border);
 

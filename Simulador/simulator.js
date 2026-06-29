@@ -1,7 +1,3 @@
-// ============================================================
-//  Simulador/simulador.js
-// ============================================================
-
 function simFmt(v) {
     if (typeof v === 'string') return '"' + v + '"';
     if (typeof v === 'boolean') return v ? 'true' : 'false';
@@ -741,7 +737,7 @@ Console.WriteLine(resultado);`,
 
 for (int i = 1; i <= 5; i = i + 1) {
     suma = suma + i;
-    Console.WriteLine("Voy sumando: " + suma);
+    Console.WriteLine("\nVoy sumando: " + suma);
 }
 
 Console.WriteLine("La suma final es: " + suma);`,
@@ -749,7 +745,7 @@ Console.WriteLine("La suma final es: " + suma);`,
         `int contador = 3;
 
 while (contador > 0) {
-    Console.WriteLine("Cuenta regresiva: " + contador);
+    Console.WriteLine("\nCuenta regresiva: " + contador);
     contador = contador - 1;
 }
 
@@ -758,7 +754,7 @@ Console.WriteLine("¡Despegue!");`,
         `int numero = 1;
 
 do {
-    Console.WriteLine("Número: " + numero);
+    Console.WriteLine("\nNúmero: " + numero);
     numero = numero + 1;
 } while (numero <= 3);
 
@@ -865,8 +861,8 @@ function simRenderInputsVariables(variables, codigoBase) {
     });
 }
 
-const _ICON_PLAY = '<img src="./img/iconos/play.png" alt="Reproducir"><span class="tooltip-text">Reproducir</span>';
-const _ICON_PAUSE = '<img src="./img/iconos/pause.png" alt="Pausar"><span class="tooltip-text">Pausar</span>';
+const _ICON_PLAY = '<img src="../img/iconos/play.png" alt="Reproducir"><span class="tooltip-text">Reproducir</span>';
+const _ICON_PAUSE = '<img src="../img/iconos/pause.png" alt="Pausar"><span class="tooltip-text">Pausar</span>';
 
 function simEjecutarSinTocarInputs(codigo) {
     const first = sim.load(codigo);
@@ -1053,11 +1049,14 @@ function simAutoPlay(btns) {
 function conectarBotones() {
     const btns = _getBtns();
 
+    // [0] Volver al inicio → regresa al PRIMER PASO conservando los valores
+    //     que el alumno haya puesto en los inputs (NO restaura el ejemplo original).
     if (btns[0]) btns[0].onclick = () => {
         simStopPlay(btns);
-        const original = EXAMPLES[simTemaActual] || '';
-        if (simEditor) simEditor.setValue(original);
-        simCargarYEjecutar(original);
+        // Reejecuta el código ACTUAL del editor (con los valores actuales) desde el paso 1.
+        // No tocamos los inputs ni restauramos EXAMPLES, así no se pierden los cambios.
+        const codigoActual = simEditor ? simEditor.getValue() : (EXAMPLES[simTemaActual] || '');
+        simEjecutarSinTocarInputs(codigoActual);
     };
 
     if (btns[1]) {
