@@ -1163,3 +1163,146 @@ pre {
         opacity: 1 !important;
     }
 }
+
+
+/* ===============================================
+   BOTONES DE PASOS (ANTERIOR Y SIGUIENTE)
+   =============================================== */
+.btn-anterior,
+.btn-siguiente {
+    position: relative; /* Clave para el tooltip */
+    background-color: #252a3a; /* Mismo fondo que .ctrl-btn */
+    border: 1px solid var(--console-border);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.15s;
+}
+
+/* Efecto Hover para ambos botones */
+.btn-anterior:hover:not(:disabled),
+.btn-siguiente:hover:not(:disabled) {
+    border-color: var(--green-main);
+}
+
+/* Cuando están deshabilitados (disabled) */
+.btn-anterior:disabled,
+.btn-siguiente:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    border-color: var(--console-border);
+}
+
+/* Estilos para las imágenes PNG de ambos botones */
+.btn-anterior img,
+.btn-siguiente img {
+    width: 18px;  
+    height: 18px;
+    filter: brightness(0) invert(1); /* Convierte tus PNGs oscuros a blanco */
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.btn-anterior:hover:not(:disabled) img,
+.btn-siguiente:hover:not(:disabled) img {
+    opacity: 1;
+}
+
+/* Tooltip unificado para ambos carteles */
+.btn-anterior .tooltip-text,
+.btn-siguiente .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #15161e; /* Fondo oscuro a juego */
+    border: 1px solid var(--console-border);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-family: Arial, Helvetica, sans-serif;
+    
+    position: absolute;
+    bottom: 130%; 
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    
+    transition: opacity 0.15s ease, visibility 0.15s;
+    z-index: 200;
+}
+
+/* Mostrar tooltips al pasar el cursor (solo si el botón no está disabled) */
+.btn-anterior:hover:not(:disabled) .tooltip-text,
+.btn-siguiente:hover:not(:disabled) .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ===============================================
+   BOTÓN REPRODUCIR (PLAY / PAUSE)
+   =============================================== */
+#btn-reproducir {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    /* ✅ Mismo texto que .btn-anterior / .btn-siguiente */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.78rem;
+    font-weight: normal;
+    letter-spacing: normal;
+}
+/* Ícono con el mismo tamaño estándar que Anterior/Siguiente */
+#btn-reproducir img {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+
+#btn-reproducir:hover img {
+    opacity: 1;
+}
+
+/* Ocultar el span de tooltip por defecto */
+#btn-reproducir .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #15161e;
+    border: 1px solid var(--console-border);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    font-family: Arial, Helvetica, sans-serif;
+
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+
+    transition: opacity 0.15s ease, visibility 0.15s;
+    z-index: 200;
+}
+
+#btn-reproducir:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+#btn-reproducir {
+    /* ...lo de arriba... */
+    padding: 6px 12px;
+    border-radius: 8px;
+}
