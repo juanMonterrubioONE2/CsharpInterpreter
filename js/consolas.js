@@ -1,3 +1,5 @@
+/* Consolas.js */
+
 function insertarConsolas() {
     document.getElementById('workspace-container').innerHTML = `
         <div class="workspace">

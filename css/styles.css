@@ -40,11 +40,13 @@ header {
 
 .app-header {
     background-color: var(--dark);
-    padding: 6px 20px;        /* antes 12px 20px → menos alto */
+    padding: 6px 20px;
+    /* antes 12px 20px → menos alto */
 }
 
 .logo {
-    width: clamp(32px, 5vw, 48px);   /* antes hasta 70px → logo más chico */
+    width: clamp(32px, 5vw, 48px);
+    /* antes hasta 70px → logo más chico */
     height: auto;
 }
 
@@ -262,7 +264,7 @@ main {
 }
 
 /* Marca verde fija en el grupo abierto (no depende de hover) */
-.nav-group.open > .nav-btn.has-sub {
+.nav-group.open>.nav-btn.has-sub {
     background-color: rgba(4, 170, 109, 0.18);
 }
 
@@ -459,7 +461,7 @@ main {
     }
 
     /* el footer queda a borde completo del main aunque main tenga padding */
-    main > .app-footer {
+    main>.app-footer {
         margin-left: -16px;
         margin-right: -16px;
         margin-bottom: -16px;
@@ -1170,8 +1172,10 @@ pre {
    =============================================== */
 .btn-anterior,
 .btn-siguiente {
-    position: relative; /* Clave para el tooltip */
-    background-color: #252a3a; /* Mismo fondo que .ctrl-btn */
+    position: relative;
+    /* Clave para el tooltip */
+    background-color: #252a3a;
+    /* Mismo fondo que .ctrl-btn */
     border: 1px solid var(--console-border);
     border-radius: 8px;
     cursor: pointer;
@@ -1199,9 +1203,10 @@ pre {
 /* Estilos para las imágenes PNG de ambos botones */
 .btn-anterior img,
 .btn-siguiente img {
-    width: 18px;  
+    width: 18px;
     height: 18px;
-    filter: brightness(0) invert(1); /* Convierte tus PNGs oscuros a blanco */
+    filter: brightness(0) invert(1);
+    /* Convierte tus PNGs oscuros a blanco */
     opacity: 0.8;
     transition: opacity 0.2s;
 }
@@ -1216,7 +1221,8 @@ pre {
 .btn-siguiente .tooltip-text {
     visibility: hidden;
     opacity: 0;
-    background-color: #15161e; /* Fondo oscuro a juego */
+    background-color: #15161e;
+    /* Fondo oscuro a juego */
     border: 1px solid var(--console-border);
     color: var(--white);
     text-align: center;
@@ -1224,14 +1230,14 @@ pre {
     padding: 5px 10px;
     font-size: 0.78rem;
     font-family: Arial, Helvetica, sans-serif;
-    
+
     position: absolute;
-    bottom: 130%; 
+    bottom: 130%;
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    
+
     transition: opacity 0.15s ease, visibility 0.15s;
     z-index: 200;
 }
@@ -1253,12 +1259,13 @@ pre {
     justify-content: center;
     gap: 6px;
 
-    /* ✅ Mismo texto que .btn-anterior / .btn-siguiente */
+    /* Mismo texto que .btn-anterior / .btn-siguiente */
     font-family: Arial, Helvetica, sans-serif;
     font-size: 0.78rem;
     font-weight: normal;
     letter-spacing: normal;
 }
+
 /* Ícono con el mismo tamaño estándar que Anterior/Siguiente */
 #btn-reproducir img {
     width: 18px;
@@ -1305,4 +1312,61 @@ pre {
     /* ...lo de arriba... */
     padding: 6px 12px;
     border-radius: 8px;
+}
+
+/* ===============================================
+   GLOSARIO — títulos de unidad
+   Agregar este bloque al FINAL de tu styles.css actual
+   =============================================== */
+.glosario-unidad-titulo {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--green-main);
+    margin: 8px 0 18px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--console-border);
+}
+
+/* ===============================================
+   TOOLTIPS DE GLOSARIO — palabras técnicas en el modal
+   Agrega este bloque al FINAL de tu styles.css
+   =============================================== */
+
+/* La palabra técnica dentro del texto del modal */
+.glosario-tip {
+    font-weight: 700;
+    color: var(--green-main);
+    border-bottom: 1px dashed var(--green-main);
+    cursor: default;   /* sin signo de interrogación */
+    transition: color 0.15s;
+}
+
+.glosario-tip:hover {
+    color: #03c47e;
+}
+
+/* El tooltip flota encima de todo porque vive dentro del <dialog>
+   (top layer del navegador) y usa position:fixed con coordenadas
+   del mouse. El ::backdrop del dialog no puede taparlo. */
+#glosario-tooltip {
+    display: none;
+    position: fixed;
+    z-index: 2147483647;   /* el máximo posible */
+    background-color: #15161e;
+    border: 1px solid var(--console-border);
+
+    color: var(--white);
+    font-size: 0.78rem;
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 240px;
+    white-space: normal;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+}
+
+#glosario-tooltip.visible {
+    display: block;
 }
