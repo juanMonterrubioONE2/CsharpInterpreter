@@ -105,6 +105,7 @@ function mostrarDescripcion(titulo, definicion) {
     const elDesc = document.getElementById('tema-descripcion');
     if (elTitulo) elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
     if (elDesc) {
+        elDesc.classList.remove('modo-ejercicio');   // ← AÑADE ESTA LÍNEA
         if (definicion) { elDesc.innerHTML = definicion; elDesc.style.display = 'block'; }
         else { elDesc.innerHTML = ''; elDesc.style.display = 'none'; }
     }
