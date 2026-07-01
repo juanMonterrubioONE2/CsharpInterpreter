@@ -1755,10 +1755,10 @@ pre {
     background: rgba(220, 53, 69, 0.22);
 }
 
-/* ════════════════════════════════════════
+/* 
    INPUTS EDITABLES — sirve para AMBOS simuladores
    (#sim-vars-editable = selectivas/ciclos, #arr-vars-editable = arreglos)
-   ════════════════════════════════════════ */
+    */
 #sim-vars-editable,
 #arr-vars-editable {
     display: flex;
