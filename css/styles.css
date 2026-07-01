@@ -1435,17 +1435,6 @@ pre {
 
 /* ── HOVER (solo escritorio con mouse real) ── */
 @media (hover: hover) and (pointer: fine) {
-    .app-sidebar:hover .nav-group:hover .nav-subgroup:hover>.nav-sub2 {
-        max-height: 240px;
-        opacity: 1;
-    }
-
-    .nav-subgroup:hover>.has-sub2 .nav-arrow2 {
-        transform: rotate(180deg);
-        color: var(--green-main);
-    }
-
-    /* evitar que el 2º nivel recorte el 3º al hacer hover */
     .app-sidebar:hover .nav-group:hover .nav-sub,
     .app-sidebar:hover .nav-group.open .nav-sub {
         max-height: 600px;

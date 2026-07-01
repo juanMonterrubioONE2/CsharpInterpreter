@@ -1536,6 +1536,7 @@ function initSimulador(tema) {
         if (!tabs) return;
         tabs.querySelectorAll('.sim-tab').forEach(btn => {
             btn.onclick = () => {
+                simStopPlay(_getBtns()); /* detiene la reproducción automática */
                 const idx = parseInt(btn.dataset.idx);
                 const it = items[idx];
                 tabs.querySelectorAll('.sim-tab').forEach(b => b.classList.remove('activo'));

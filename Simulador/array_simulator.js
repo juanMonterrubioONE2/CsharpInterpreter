@@ -10,13 +10,7 @@
 //  El editor Monaco queda en modo solo-lectura. Las variables
 //  escalares declaradas con un valor literal en el nivel superior
 //  del programa se exponen como inputs editables encima del editor.
-//
-//  NOTA: esta versión toma los botones por ID (btn-reiniciar,
-//  btn-paso-anterior, btn-paso-siguiente, btn-reproducir) para ser
-//  compatible con el consolas.js actual, donde anterior/siguiente
-//  NO usan la clase .ctrl-btn.
-// ============================================================
-
+//+
 // ── Utilidades ───────────────────────────────────────────────
 
 function arrEscape(str) {
