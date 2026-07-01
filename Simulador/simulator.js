@@ -1079,7 +1079,7 @@ const EJERCICIOS = {
     if_simple: {
         enunciado: "Una tienda en línea quiere premiar a los clientes que gastan más. La regla es sencilla: cuando el total de la compra supera los $500, el envío corre por cuenta de la tienda; en caso contrario, el cliente debe pagar un costo fijo de envío. Tu tarea es tomar el total de la compra, compararlo con ese límite y mostrar en pantalla el mensaje adecuado según si el envío es gratis o tiene costo.",
         codigo:
-`int totalCompra = 650;
+            `int totalCompra = 650;
 
 if (totalCompra > 500) {
     Console.WriteLine("¡Felicidades! Tu envío es gratis");
@@ -1090,7 +1090,7 @@ if (totalCompra > 500) {
     switch_simple: {
         enunciado: "En un cruce vehicular, el semáforo se controla con un número que representa el color encendido: el 1 es verde, el 2 es amarillo y el 3 es rojo. Cada color indica una acción distinta para el conductor. Tu tarea es recibir ese número, identificar a qué color corresponde y mostrar en pantalla qué debe hacer el conductor en ese momento. Si llega un número que no corresponde a ningún color válido, se debe avisar que el semáforo está descompuesto.",
         codigo:
-`int semaforo = 2;
+            `int semaforo = 2;
 string accion;
 
 switch (semaforo) {
@@ -1113,7 +1113,7 @@ Console.WriteLine("Acción: " + accion);`
     ternario_simple: {
         enunciado: "Un programa necesita clasificar cualquier número que reciba según su signo, indicando si es positivo o negativo. Para este caso, considera que el cero cuenta como positivo. La solución debe ser lo más compacta posible: en lugar de escribir un if completo, resuelve la decisión en una sola línea usando el operador ternario, guardando el resultado en una variable de texto y mostrándolo al final.",
         codigo:
-`int numero = -4;
+            `int numero = -4;
 
 string signo = (numero >= 0) ? "El número es positivo" : "El número es negativo";
 
@@ -1124,7 +1124,7 @@ Console.WriteLine(signo);`
     if_anidada: {
         enunciado: "Un cine proyecta una película clasificada para mayores de 18 años, así que el acceso tiene dos filtros que deben cumplirse en orden. Primero se revisa la edad de la persona: si no es mayor de edad, no puede entrar y ahí termina todo. Solo si ya cumplió ese primer requisito, se revisa un segundo detalle: que traiga consigo una identificación para comprobar su edad. Tu tarea es encadenar estas dos comprobaciones, una dentro de la otra, y mostrar el mensaje correcto para cada situación posible.",
         codigo:
-`int edad = 20;
+            `int edad = 20;
 bool tieneIdentificacion = true;
 
 if (edad >= 18) {
@@ -1140,7 +1140,7 @@ if (edad >= 18) {
     switch_anidada: {
         enunciado: "Una plataforma maneja dos tipos de membresía identificados con un número: la 1 es General y la 2 es Premium. Los clientes Generales no reciben beneficios, pero los Premium sí, y aquí entra una segunda decisión: si el cliente Premium acumuló 100 puntos o más, se le entrega un regalo; si tiene menos, recibe un descuento. Tu tarea es primero identificar el tipo de membresía y, únicamente para el caso Premium, revisar además la cantidad de puntos para decidir el beneficio exacto que le corresponde.",
         codigo:
-`int membresia = 2;
+            `int membresia = 2;
 int puntos = 120;
 
 switch (membresia) {
@@ -1162,7 +1162,7 @@ switch (membresia) {
     ternario_anidada: {
         enunciado: "Un sistema escolar necesita convertir una calificación numérica, que va de 0 a 100, en su letra correspondiente siguiendo varios rangos: una calificación de 90 o más equivale a una A, de 80 a 89 es una B, de 70 a 79 es una C, y cualquier valor por debajo de 70 se considera Reprobado. Como hay más de dos posibles resultados, tu tarea es resolverlo encadenando varios operadores ternarios, de modo que se evalúen los rangos de mayor a menor hasta encontrar el que corresponde.",
         codigo:
-`int calificacion = 76;
+            `int calificacion = 76;
 
 string letra = (calificacion >= 90) ? "A" : (calificacion >= 80) ? "B" : (calificacion >= 70) ? "C" : "Reprobado";
 
@@ -1173,7 +1173,7 @@ Console.WriteLine("Calificación: " + letra);`
     if_compuesta: {
         enunciado: "Un banco evalúa las solicitudes de préstamo aplicando varios requisitos que deben cumplirse todos al mismo tiempo. Para aprobar el préstamo, el solicitante tiene que ganar $10000 o más y, además, tener una edad dentro del rango permitido, que va de los 21 a los 65 años. Si falla aunque sea una sola de estas condiciones, el préstamo se rechaza. Tu tarea es combinar todas estas comprobaciones en una única condición usando el operador Y (&&) y mostrar si el préstamo fue aprobado o rechazado.",
         codigo:
-`int sueldo = 12000;
+            `int sueldo = 12000;
 int edad = 30;
 
 if (sueldo >= 10000 && edad >= 21 && edad <= 65) {
@@ -1185,7 +1185,7 @@ if (sueldo >= 10000 && edad >= 21 && edad <= 65) {
     switch_compuesta: {
         enunciado: "Construye una calculadora básica que trabaje con dos números y permita elegir la operación a realizar mediante un número de opción: el 1 corresponde a la suma, el 2 a la resta y el 3 a la multiplicación. Según la opción que se reciba, el programa debe realizar el cálculo correspondiente entre los dos números y mostrar el resultado en pantalla. Si se elige una opción que no existe, el programa debe avisar que la operación no es válida.",
         codigo:
-`int opcion = 3;
+            `int opcion = 3;
 int num1 = 12;
 int num2 = 4;
 
@@ -1207,7 +1207,7 @@ switch (opcion) {
     ternario_compuesta: {
         enunciado: "Una escuela otorga becas solo a los alumnos que demuestran buen desempeño en dos aspectos a la vez. Para ganar la beca, el alumno debe tener un promedio de 9 o más y, al mismo tiempo, no tener ninguna materia reprobada. Basta con que falle uno de los dos requisitos para quedar sin beca. Tu tarea es unir ambas condiciones en una sola comprobación con el operador Y (&&) y resolver la decisión en una única línea usando el operador ternario, mostrando al final si el alumno obtiene o no la beca.",
         codigo:
-`int promedio = 9;
+            `int promedio = 9;
 int reprobadas = 0;
 
 string resultado = (promedio >= 9 && reprobadas == 0) ? "Obtiene beca" : "No obtiene beca";
@@ -1363,22 +1363,47 @@ function simCargarYEjecutar(codigo) {
         .sim-speed-val { font-size:0.78em; color:#04AA6D; min-width:30px; text-align:right; }
         #panel-vars .var { padding:2px 0; }
 
-        #sim-vars-editable {
-            display:flex; flex-wrap:wrap; gap:14px;
-            padding:10px 14px; margin-bottom:8px;
-            background:#1e2130; border:1px solid #3a3d4a; border-radius:8px;
-        }
-        .sim-var-field { display:flex; flex-direction:column; gap:4px; min-width:120px; }
-        .sim-var-field label {
-            font-size:0.72em; color:#8a9ab5; font-family:monospace;
-            text-transform:none; letter-spacing:0.02em;
-        }
-        .sim-var-input {
-            background:#15161e; border:1px solid #3a3d4a; color:#fff;
-            padding:6px 10px; border-radius:6px; font-family:'Consolas',monospace;
-            font-size:0.9em; outline:none; transition:border-color 0.15s;
-        }
-        .sim-var-input:focus { border-color:#04AA6D; }
+        /* Inputs editables del simulador de ARREGLOS (mismo look que el de selectivas) */
+#arr-vars-editable {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    background: #1e2130;
+    border: 1px solid #3a3d4a;
+    border-radius: 8px;
+}
+#arr-vars-editable:empty {
+    display: none;
+}
+.arr-var-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+}
+.arr-var-field label {
+    font-size: 0.72em;
+    color: #8a9ab5;
+    font-family: monospace;
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+.arr-var-input {
+    background: #15161e;
+    border: 1px solid #3a3d4a;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.9em;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.arr-var-input:focus {
+    border-color: #04AA6D;
+}
     `;
     document.head.appendChild(style);
 })();
