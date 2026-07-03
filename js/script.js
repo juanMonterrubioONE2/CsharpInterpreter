@@ -12,7 +12,6 @@ function mostrarPantallaTema() {
     if (inicio) inicio.style.display = 'none';
     if (tema) tema.style.display = 'block';
 }
-
 //  SIDEBAR — abrir / cerrar en móvil
 const toggleBtn = document.getElementById('sidebarToggle');
 const sidebar = document.getElementById('sidebar');
@@ -55,7 +54,6 @@ function crearHandler(fn) {
         }
     };
 }
-
 //  SUBMENÚ — acordeón
 document.querySelectorAll('.nav-group .has-sub').forEach(btn => {
     const fn = () => {
@@ -74,6 +72,7 @@ document.querySelectorAll('.nav-subgroup .has-sub2').forEach(btn => {
     const fn = () => {
         const sub = btn.closest('.nav-subgroup');
         const isOpen = sub.classList.contains('open');
+        // cierra los subgrupos hermanos para que solo uno quede abierto
         sub.parentElement.querySelectorAll('.nav-subgroup.open')
             .forEach(s => s.classList.remove('open'));
         if (!isOpen) sub.classList.add('open');
@@ -106,7 +105,7 @@ function mostrarDescripcion(titulo, definicion) {
     const elDesc = document.getElementById('tema-descripcion');
     if (elTitulo) elTitulo.innerHTML = titulo ? `<h2 class="tema-titulo-text">${titulo}</h2>` : '';
     if (elDesc) {
-        elDesc.classList.remove('modo-ejercicio');
+        elDesc.classList.remove('modo-ejercicio');   // ← AÑADE ESTA LÍNEA
         if (definicion) { elDesc.innerHTML = definicion; elDesc.style.display = 'block'; }
         else { elDesc.innerHTML = ''; elDesc.style.display = 'none'; }
     }
@@ -133,9 +132,12 @@ Uso: tip('palabra', 'explicación corta')
 Genera un <span class="glosario-tip"> con data-tip */
 
 function tip(palabra, explicacion) {
+    // Las comillas dobles dentro del atributo data-tip rompen el HTML
+    // porque cierran el atributo antes de tiempo. Las escapamos a &quot;
     const textoSeguro = explicacion.replace(/"/g, '&quot;');
     return `<span class="glosario-tip" data-tip="${textoSeguro}">${palabra}</span>`;
 }
+
 
 //  VISTA DE GLOSARIO
 const glosarioUnidades = [
@@ -180,6 +182,7 @@ function cargarGlosario() {
             for (const clave of grupo.terminos) {
                 const datos = glosarioTerminos[clave];
                 if (!datos) continue;
+                // Para la tarjeta del glosario usamos el texto plano (sin HTML de tips)
                 const conceptoPlano = datos.conceptoPlano || datos.concepto;
                 html += `
                     <div class="col">
@@ -228,9 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarPantallaInicio();
     }
 
+    // ── Tooltip del modal ──────────────────────────────────────────────
+    // El <dialog> vive en el "top layer" del navegador. Su ::backdrop
+    // también vive ahí y tapa cualquier elemento con position:fixed
+    // que esté fuera del dialog. La única solución real es insertar
+    // el tooltip DENTRO del <dialog> y usar position:fixed con las
+    // coordenadas absolutas del mouse (clientX/clientY). Al estar
+    // dentro del top-layer, fixed se comporta como se espera y el
+    // backdrop ya no lo puede tapar.
+    // ──────────────────────────────────────────────────────────────────
     const modalDialog = document.getElementById('modal-concepto');
     const tooltipBox = document.createElement('div');
     tooltipBox.id = 'glosario-tooltip';
+    // Insertarlo como PRIMER hijo del dialog para que quede por encima
+    // del modal-content-wrapper y su backdrop interno.
     if (modalDialog) {
         modalDialog.insertBefore(tooltipBox, modalDialog.firstChild);
     } else {
@@ -243,21 +257,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const texto = el.getAttribute('data-tip');
         if (!texto) return;
 
+        // 1. Poner el texto y hacerlo visible PRIMERO para que el navegador
+        //    calcule el tamaño real antes de leer offsetWidth/offsetHeight.
         tooltipBox.textContent = texto;
         tooltipBox.classList.add('visible');
 
+        // 2. Leer dimensiones REALES ya renderizadas
         const tw = tooltipBox.offsetWidth;
         const th = tooltipBox.offsetHeight;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
 
+        // Posición anclada al elemento (no al cursor), encima y centrada
         const elRect = el.getBoundingClientRect();
         let left = elRect.left + elRect.width / 2 - tw / 2;
         let top = elRect.top - th - 8;
 
+        // Evitar que se salga de la pantalla
         if (left < 8) left = 8;
         if (left + tw > vw - 8) left = vw - tw - 8;
-        if (top < 8) top = elRect.bottom + 8;
+        if (top < 8) top = elRect.bottom + 8;   // aparece abajo si no cabe arriba
         if (top + th > vh - 8) top = vh - th - 8;
 
         tooltipBox.style.left = left + 'px';
@@ -269,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) tooltipBox.classList.remove('visible');
     });
 });
+
 
 //DICCIONARIO
 
@@ -305,7 +325,14 @@ const diccionarioTemas = {
     }
 };
 
+// ============================================================
+//  GLOSARIO — términos del temario con tooltips en palabras técnicas
+//  "conceptoPlano" es el texto sin HTML, para la vista previa de la tarjeta.
+//  "concepto" es el texto con tooltips, para mostrar en el modal.
+// ============================================================
 const glosarioTerminos = {
+
+    // ── Unidad II ──────────────────────────────────────────
 
     datos_primitivos: {
         titulo: "Datos primitivos",
@@ -435,6 +462,8 @@ const glosarioTerminos = {
         conclusion: `Es como escuchar música en repeat: sigue sonando mientras no la pares. No importa cuántas veces haya repetido, lo que importa es si la condición para continuar sigue siendo verdadera.`
     },
 
+    // ── Unidad III ─────────────────────────────────────────
+
     funciones: {
         titulo: "Funciones",
         conceptoPlano: "Una función es un bloque de instrucciones al que le pones nombre y que hace una tarea específica. Puedes llamarla todas las veces que necesites sin tener que reescribir el código.",
@@ -467,6 +496,8 @@ const glosarioTerminos = {
         conclusion: `Entender la pila de llamadas te ayuda a saber exactamente qué está haciendo el programa en cada momento. También te explica por qué una recursividad sin caso base es peligrosa: la pila seguiría creciendo hasta que el programa colapse.`
     },
 
+    // ── Unidad IV ──────────────────────────────────────────
+
     arreglos: {
         titulo: "Arreglos",
         conceptoPlano: "Un arreglo es una estructura que te permite guardar varios valores del mismo tipo bajo un solo nombre. Para acceder a un valor específico usas su número de posición, llamado índice.",
@@ -480,11 +511,11 @@ const glosarioTerminos = {
         conceptoPlano: "Los archivos permiten guardar información de forma permanente en el disco duro de la computadora. A diferencia de las variables (que se borran cuando el programa termina), lo que guardas en un archivo sigue ahí aunque apagues la computadora.",
         concepto: `Los archivos guardan información de forma permanente en el ${tip('disco duro', 'El almacenamiento permanente de la computadora. A diferencia de la RAM, no se borra al apagar')}. A diferencia de las ${tip('variables', 'Espacios en memoria RAM que solo existen mientras el programa está corriendo. Al cerrarlo, desaparecen')}, los archivos conservan los datos aunque el programa se cierre o la computadora se apague.`,
         caso: `"Un juego guarda tu progreso en un archivo. La próxima vez que lo abres, lee ese archivo y restaura exactamente dónde te quedaste: tu nivel, tu inventario y tus puntos. Sin archivos, empezarías desde cero cada vez."`,
-        conclusion: `Los archivos son la memoria a largo plazo del programa. Las variables son lo que recuerda mientras está despierto; los archivos son lo que recuerda al día siguiente. Sin ellos, cada vez que abririerías el programa sería como la primera vez.`
+        conclusion: `Los archivos son la memoria a largo plazo del programa. Las variables son lo que recuerda mientras está despierto; los archivos son lo que recuerda al día siguiente. Sin ellos, cada vez que abrirías el programa sería como la primera vez.`
     }
 };
 
-//  MODAL — abrir con innerHTML para que los tips funcionen
+// MODAL — abrir con innerHTML para que los tips funcionen
 
 function abrirConceptoModal(idTema) {
     const modal = document.getElementById('modal-concepto');
@@ -493,6 +524,7 @@ function abrirConceptoModal(idTema) {
 
     document.getElementById('modal-titulo').innerText = datos.titulo;
 
+    // innerHTML para que los <span class="glosario-tip"> se rendericen
     document.getElementById('modal-descripcion-texto').innerHTML = datos.concepto;
     document.getElementById('modal-caso-practico').innerHTML = datos.caso;
     document.getElementById('modal-abstraccion-conclusión').innerHTML = datos.conclusion;
