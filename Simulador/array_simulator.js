@@ -92,12 +92,12 @@ const ARR_EXAMPLES = {
 `// Llenar un arreglo con ciclo for
 int[] numeros = new int[5];
 
-for (int i = 0; i < numeros.Length; i++) {
-    numeros[i] = (i + 1) * 10;
+for (int pos = 0; pos < numeros.Length; pos++) {
+    numeros[pos] = (pos + 1) * 10;
 }
 
-for (int i = 0; i < numeros.Length; i++) {
-    Console.WriteLine("numeros[" + i + "] = " + numeros[i]);
+for (int pos = 0; pos < numeros.Length; pos++) {
+    Console.WriteLine("numeros[" + pos + "] = " + numeros[pos]);
 }
 
 Console.WriteLine("Longitud = " + numeros.Length);`,
@@ -107,8 +107,8 @@ Console.WriteLine("Longitud = " + numeros.Length);`,
 int[] temps = {22, 25, 19, 28, 24};
 int suma = 0;
 
-for (int i = 0; i < temps.Length; i++) {
-    suma = suma + temps[i];
+for (int pos = 0; pos < temps.Length; pos++) {
+    suma = suma + temps[pos];
 }
 
 int promedio = suma / temps.Length;
@@ -121,12 +121,12 @@ int[] califs = {75, 92, 88, 61, 95};
 int mayor = califs[0];
 int menor = califs[0];
 
-for (int i = 1; i < califs.Length; i++) {
-    if (califs[i] > mayor) {
-        mayor = califs[i];
+for (int pos = 1; pos < califs.Length; pos++) {
+    if (califs[pos] > mayor) {
+        mayor = califs[pos];
     }
-    if (califs[i] < menor) {
-        menor = califs[i];
+    if (califs[pos] < menor) {
+        menor = califs[pos];
     }
 }
 
@@ -141,9 +141,9 @@ Console.WriteLine("Mas baja: " + menor);`
 `// Tabla de multiplicar en una matriz 3x3
 int[,] tabla = new int[3,3];
 
-for (int f = 0; f < tabla.GetLength(0); f++) {
-    for (int c = 0; c < tabla.GetLength(1); c++) {
-        tabla[f,c] = (f + 1) * (c + 1);
+for (int fila = 0; fila < tabla.GetLength(0); fila++) {
+    for (int col = 0; col < tabla.GetLength(1); col++) {
+        tabla[fila,col] = (fila + 1) * (col + 1);
     }
 }
 
@@ -165,12 +165,12 @@ ventas[2,0] = 200;
 ventas[2,1] = 180;
 ventas[2,2] = 210;
 
-for (int f = 0; f < ventas.GetLength(0); f++) {
+for (int fila = 0; fila < ventas.GetLength(0); fila++) {
     int suma = 0;
-    for (int c = 0; c < ventas.GetLength(1); c++) {
-        suma = suma + ventas[f,c];
+    for (int col = 0; col < ventas.GetLength(1); col++) {
+        suma = suma + ventas[fila,col];
     }
-    Console.WriteLine("Vendedor " + (f + 1) + ": $" + suma);
+    Console.WriteLine("Vendedor " + (fila + 1) + ": $" + suma);
 }`,
 
         // Ejemplo 3 — Encontrar el mayor de toda la matriz
@@ -188,10 +188,10 @@ temps[2,1] = 20;
 temps[2,2] = 17;
 
 int maxTemp = temps[0,0];
-for (int f = 0; f < temps.GetLength(0); f++) {
-    for (int c = 0; c < temps.GetLength(1); c++) {
-        if (temps[f,c] > maxTemp) {
-            maxTemp = temps[f,c];
+for (int fila = 0; fila < temps.GetLength(0); fila++) {
+    for (int col = 0; col < temps.GetLength(1); col++) {
+        if (temps[fila,col] > maxTemp) {
+            maxTemp = temps[fila,col];
         }
     }
 }
@@ -215,9 +215,9 @@ int[] precios = {120, 350, 89, 275, 499};
 int total = 0;
 int caros = 0;
 
-for (int i = 0; i < precios.Length; i++) {
-    total = total + precios[i];
-    if (precios[i] > umbral) {
+for (int pos = 0; pos < precios.Length; pos++) {
+    total = total + precios[pos];
+    if (precios[pos] > umbral) {
         caros = caros + 1;
     }
 }
@@ -247,17 +247,17 @@ calif[2,2] = 91;
 
 int aprobados = 0;
 
-for (int a = 0; a < calif.GetLength(0); a++) {
+for (int alumno = 0; alumno < calif.GetLength(0); alumno++) {
     int suma = 0;
-    for (int m = 0; m < calif.GetLength(1); m++) {
-        suma = suma + calif[a,m];
+    for (int materia = 0; materia < calif.GetLength(1); materia++) {
+        suma = suma + calif[alumno,materia];
     }
     int prom = suma / calif.GetLength(1);
     if (prom >= notaMinima) {
-        Console.WriteLine("Alumno " + (a + 1) + ": " + prom + " aprobado");
+        Console.WriteLine("Alumno " + (alumno + 1) + ": " + prom + " aprobado");
         aprobados = aprobados + 1;
     } else {
-        Console.WriteLine("Alumno " + (a + 1) + ": " + prom + " reprobado");
+        Console.WriteLine("Alumno " + (alumno + 1) + ": " + prom + " reprobado");
     }
 }
 
@@ -415,15 +415,48 @@ function arrCargarYEjecutar(codigo) {
 
 // ── Render de memoria (variables, arreglos y matrices) ────────
 
+function arrBuildForBoxHtml(forCtx) {
+    if (!forCtx) return '';
+    const valNow = forCtx.varValue !== null ? arrEscape(String(forCtx.varValue)) : '?';
+    let condBadge = '';
+    if (forCtx.condResult !== null) {
+        const yes = forCtx.condResult;
+        condBadge = '<span class="sim-for-badge ' + (yes ? 'sim-for-t' : 'sim-for-f') + '">' +
+            (yes ? '✓ verdadero' : '✗ falso') + '</span>';
+    }
+    return '<div class="sim-for-panel">' +
+        '<div class="sim-for-header">⟳ ciclo <b>for</b></div>' +
+        '<div class="sim-for-parts">' +
+            '<div class="sim-for-part">' +
+                '<div class="sim-for-label">inicializador</div>' +
+                '<code class="sim-for-code">' + arrEscape(forCtx.varName) + ' = …</code>' +
+                '<div class="sim-for-now">ahora: <b>' + valNow + '</b></div>' +
+            '</div>' +
+            '<div class="sim-for-part">' +
+                '<div class="sim-for-label">condición</div>' +
+                '<code class="sim-for-code">' + arrEscape(forCtx.condText) + '</code>' +
+                (condBadge ? '<div class="sim-for-now">' + condBadge + '</div>' : '') +
+            '</div>' +
+            '<div class="sim-for-part">' +
+                '<div class="sim-for-label">avance</div>' +
+                '<code class="sim-for-code">' + arrEscape(forCtx.updateText) + '</code>' +
+            '</div>' +
+        '</div>' +
+    '</div>';
+}
+
 function arrBuildMemoriaHtml(state) {
     const ch = new Set(state.changed || []);
-    let html = '';
+    const rd = new Set(state.read || []);
+    let html = arrBuildForBoxHtml(state.forCtx);
 
     if (state.variables && state.variables.length) {
         html += '<div class="cs-mem-block"><div class="cs-mem-head">Variables<span class="n">' + state.variables.length + '</span></div>';
         state.variables.forEach(v => {
             const f = arrFmtVal(v.value, v.type);
-            html += '<div class="cs-var-row">' + arrEscape(v.type) + ' <b>' + arrEscape(v.name) + '</b> = ' + arrEscape(f.text) + '</div>';
+            const changed = ch.has(v.name);
+            html += '<div class="cs-var-row' + (changed ? ' cs-flash' : '') + '">' +
+                arrEscape(v.type) + ' <b>' + arrEscape(v.name) + '</b> = ' + arrEscape(f.text) + '</div>';
         });
         html += '</div>';
     }
@@ -434,10 +467,14 @@ function arrBuildMemoriaHtml(state) {
             html += '<div class="cs-arr"><div class="cs-arr-name">' + arrEscape(a.type) + '[] <b>' + arrEscape(a.name) + '</b><span class="meta">.Length = ' + a.length + '</span></div>';
             html += '<div class="cs-cells">';
             for (let i = 0; i < a.length; i++) {
-                const val  = a.values[i];
-                const isch = ch.has(a.name + '[' + i + ']');
-                html += '<div class="cs-cell-wrap"><div class="cs-cell-idx">' + i + '</div>' +
-                    '<div class="cs-cell' + (val === null ? ' cs-null' : '') + (isch ? ' cs-flash' : '') + '">' + arrEscape(arrCellText(val)) + '</div></div>';
+                const val   = a.values[i];
+                const isch  = ch.has(a.name + '[' + i + ']');
+                const isrd  = !isch && rd.has(a.name + '[' + i + ']');
+                const extra = isch ? ' cs-flash' : (isrd ? ' cs-read' : '');
+                html += '<div class="cs-cell-wrap">' +
+                    '<div class="cs-cell-idx' + (isrd ? ' cs-read-idx' : '') + '">' + i + '</div>' +
+                    '<div class="cs-cell' + (val === null ? ' cs-null' : '') + extra + '">' + arrEscape(arrCellText(val)) + '</div>' +
+                    '</div>';
             }
             html += '</div></div>';
         });
@@ -454,9 +491,12 @@ function arrBuildMemoriaHtml(state) {
             for (let r = 0; r < m.rows; r++) {
                 html += '<tr><th>F' + r + '</th>';
                 for (let c = 0; c < m.cols; c++) {
-                    const val  = m.values[r][c];
-                    const isch = ch.has(m.name + '[' + r + ',' + c + ']');
-                    html += '<td><div class="cs-mcell' + (val === null ? ' cs-null' : '') + (isch ? ' cs-flash' : '') + '">' + arrEscape(arrCellText(val)) + '</div></td>';
+                    const val   = m.values[r][c];
+                    const key   = m.name + '[' + r + ',' + c + ']';
+                    const isch  = ch.has(key);
+                    const isrd  = !isch && rd.has(key);
+                    const extra = isch ? ' cs-flash' : (isrd ? ' cs-read' : '');
+                    html += '<td><div class="cs-mcell' + (val === null ? ' cs-null' : '') + extra + '">' + arrEscape(arrCellText(val)) + '</div></td>';
                 }
                 html += '</tr>';
             }
