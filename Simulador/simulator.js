@@ -1453,7 +1453,12 @@ function simCargarYEjecutar(codigo) {
 
 function simBuildForBoxHtml(forCtx) {
     if (!forCtx) return '';
-    const valNow = forCtx.varValue !== null ? simEscape(simFmt(forCtx.varValue)) : '?';
+    const val    = forCtx.varValue !== null ? forCtx.varValue : '?';
+    const valStr = simEscape(simFmt(val));
+    // Sustituye el nombre de la variable por su valor numérico actual
+    const varRe         = new RegExp('\\b' + forCtx.varName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g');
+    const condWithVal   = simEscape(forCtx.condText.replace(varRe,   String(val)));
+    const updateWithVal = simEscape(forCtx.updateText.replace(varRe, String(val)));
     let condBadge = '';
     if (forCtx.condResult !== null) {
         const yes = forCtx.condResult;
@@ -1465,17 +1470,16 @@ function simBuildForBoxHtml(forCtx) {
         '<div class="sim-for-parts">' +
             '<div class="sim-for-part">' +
                 '<div class="sim-for-label">inicializador</div>' +
-                '<code class="sim-for-code">' + simEscape(forCtx.varName) + ' = …</code>' +
-                '<div class="sim-for-now">ahora: <b>' + valNow + '</b></div>' +
+                '<code class="sim-for-code">' + simEscape(forCtx.varName) + ' = <b class="sim-for-t">' + valStr + '</b></code>' +
             '</div>' +
             '<div class="sim-for-part">' +
                 '<div class="sim-for-label">condición</div>' +
-                '<code class="sim-for-code">' + simEscape(forCtx.condText) + '</code>' +
+                '<code class="sim-for-code">' + condWithVal + '</code>' +
                 (condBadge ? '<div class="sim-for-now">' + condBadge + '</div>' : '') +
             '</div>' +
             '<div class="sim-for-part">' +
                 '<div class="sim-for-label">avance</div>' +
-                '<code class="sim-for-code">' + simEscape(forCtx.updateText) + '</code>' +
+                '<code class="sim-for-code">' + updateWithVal + '</code>' +
             '</div>' +
         '</div>' +
     '</div>';
