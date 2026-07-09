@@ -170,8 +170,7 @@
                 </div>
             </div>
 
-            <button class="btn btn--primary"
-                onclick="alert('Aquí se conectará con la API de login (matrícula + contraseña).')">Entrar</button>
+            <button class="btn btn--primary" onclick="handleLogin()">Entrar</button>
 
             <p class="auth-alt">¿No tienes cuenta? <button onclick="showAuth('register')">Regístrate</button></p>
         </div>
@@ -240,14 +239,13 @@
                 <p class="hint">Tu contraseña se guardará de forma segura (cifrada).</p>
             </div>
 
-            <button class="btn btn--primary"
-                onclick="alert('Aquí se conectará con la API de registro (crea el alumno en la base de datos).')">Crear
-                cuenta</button>
+            <button class="btn btn--primary" onclick="handleRegister()">Crear cuenta</button>
 
             <p class="auth-alt">¿Ya tienes cuenta? <button onclick="showAuth('login')">Inicia sesión</button></p>
         </div>
     </div>
 
+    <script src="../api.js"></script>
     <script src="inicio.js"></script>
 </body>
 

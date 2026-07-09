@@ -1,3 +1,8 @@
+// Si no hay sesión activa, redirigir al login
+if (window.ApiClient && !window.ApiClient.haySesion()) {
+    window.location.href = './Inicio/inicio.html';
+}
+
 //  HELPERS — mostrar / ocultar pantallas
 function mostrarPantallaInicio() {
     const inicio = document.getElementById('pantalla-inicio');
