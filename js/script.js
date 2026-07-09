@@ -139,6 +139,42 @@ function tip(palabra, explicacion) {
 }
 
 
+// ── API GLOSARIO — caché y helpers ────────────────────────
+let _glosarioCache = null;
+let _glosarioPromesa = null;
+let _glosarioPorId = null;
+
+async function obtenerGlosario() {
+    if (_glosarioCache) return _glosarioCache;
+    if (_glosarioPromesa) return _glosarioPromesa;
+    if (!window.ApiClient) throw new Error('ApiClient no disponible');
+
+    _glosarioPromesa = (async () => {
+        const datos = await window.ApiClient.listarGlosario();
+        _glosarioCache = Array.isArray(datos) ? datos : [];
+        _glosarioPorId = {};
+        for (const t of _glosarioCache) _glosarioPorId[t.id] = t;
+        return _glosarioCache;
+    })();
+
+    try {
+        return await _glosarioPromesa;
+    } catch (e) {
+        _glosarioPromesa = null;
+        throw e;
+    }
+}
+
+function renderTips(texto, tips) {
+    if (!texto) return '';
+    const mapa = {};
+    for (const t of (tips || [])) mapa[t.marcador.toLowerCase()] = t.explicacion;
+    return texto.replace(/\[\[(.+?)\]\]/g, (_, palabra) => {
+        const expl = mapa[palabra.toLowerCase()];
+        return expl ? tip(palabra, expl) : palabra;
+    });
+}
+
 //  VISTA DE GLOSARIO
 const glosarioUnidades = [
     {
@@ -160,7 +196,7 @@ const glosarioUnidades = [
     }
 ];
 
-function cargarGlosario() {
+async function cargarGlosario() {
     limpiarPantalla();
     mostrarPantallaTema();
 
@@ -168,13 +204,57 @@ function cargarGlosario() {
     const temaDesc = document.getElementById('tema-descripcion');
     const gridModulos = document.getElementById('grid-modulos');
 
-    if (temaTitulo) {
-        temaTitulo.innerHTML = `<h2 class="fw-bold text-white mb-1">Conceptos</h2>`;
-    }
+    if (temaTitulo) temaTitulo.innerHTML = `<h2 class="fw-bold text-white mb-1">Conceptos</h2>`;
     if (temaDesc) temaDesc.style.display = 'none';
+    if (!gridModulos) return;
 
-    if (gridModulos) {
-        gridModulos.className = '';
+    gridModulos.className = '';
+
+    // Intentar cargar desde API
+    let terminos = null;
+    try {
+        terminos = await obtenerGlosario();
+    } catch (e) {
+        terminos = null;
+    }
+
+    if (terminos && terminos.length > 0) {
+        // Render desde API
+        const ORDEN_UNIDADES = ['Unidad II', 'Unidad III', 'Unidad IV', 'Operadores'];
+        const UNIDADES_OCULTAS = ['General'];
+        const porUnidad = {};
+        for (const t of terminos) {
+            const u = t.unidad || 'General';
+            if (UNIDADES_OCULTAS.includes(u)) continue;
+            (porUnidad[u] = porUnidad[u] || []).push(t);
+        }
+        for (const u in porUnidad) porUnidad[u].sort((a, b) => (a.id || 0) - (b.id || 0));
+        const grupos = [];
+        for (const u of ORDEN_UNIDADES) {
+            if (porUnidad[u]) { grupos.push({ unidad: u, terminos: porUnidad[u] }); delete porUnidad[u]; }
+        }
+        for (const u in porUnidad) grupos.push({ unidad: u, terminos: porUnidad[u] });
+
+        let html = '';
+        for (const grupo of grupos) {
+            html += `<h3 class="glosario-unidad-titulo">${grupo.unidad}</h3>`;
+            html += `<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">`;
+            for (const t of grupo.terminos) {
+                const plano = (t.definicion || '').replace(/\[\[(.+?)\]\]/g, '$1');
+                const corto = plano.length > 90 ? plano.slice(0, 90).trim() + '…' : plano;
+                html += `
+                    <div class="col">
+                        <button class="card h-100 p-4 w-100 text-start modular-card-btn" onclick="abrirConceptoModal('${t.id}')">
+                            <h4 class="text-white fw-bold mb-1">${t.termino}</h4>
+                            <p class="text-white small flex-grow-1 m-0 mt-2">${corto}</p>
+                        </button>
+                    </div>`;
+            }
+            html += `</div>`;
+        }
+        gridModulos.innerHTML = html;
+    } else {
+        // Fallback: datos locales
         let html = '';
         for (const grupo of glosarioUnidades) {
             html += `<h3 class="glosario-unidad-titulo">${grupo.unidad}</h3>`;
@@ -182,7 +262,6 @@ function cargarGlosario() {
             for (const clave of grupo.terminos) {
                 const datos = glosarioTerminos[clave];
                 if (!datos) continue;
-                // Para la tarjeta del glosario usamos el texto plano (sin HTML de tips)
                 const conceptoPlano = datos.conceptoPlano || datos.concepto;
                 html += `
                     <div class="col">
@@ -517,17 +596,36 @@ const glosarioTerminos = {
 
 // MODAL — abrir con innerHTML para que los tips funcionen
 
-function abrirConceptoModal(idTema) {
+async function abrirConceptoModal(idTema) {
     const modal = document.getElementById('modal-concepto');
-    const datos = glosarioTerminos[idTema] || diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
     if (!modal) return;
 
-    document.getElementById('modal-titulo').innerText = datos.titulo;
+    // Precargar caché de API si aún no existe
+    if (!_glosarioPorId) {
+        try { await obtenerGlosario(); } catch (e) { /* usa respaldo local */ }
+    }
 
-    // innerHTML para que los <span class="glosario-tip"> se rendericen
-    document.getElementById('modal-descripcion-texto').innerHTML = datos.concepto;
-    document.getElementById('modal-caso-practico').innerHTML = datos.caso;
-    document.getElementById('modal-abstraccion-conclusión').innerHTML = datos.conclusion;
+    // Buscar término: primero en caché API, luego en datos locales
+    let datos = null;
+    let usandoApi = false;
+    if (_glosarioPorId && _glosarioPorId[idTema]) {
+        datos = _glosarioPorId[idTema];
+        usandoApi = true;
+    } else {
+        datos = glosarioTerminos[idTema] || diccionarioTemas[idTema] || diccionarioTemas["Selectivas"];
+    }
+
+    if (usandoApi) {
+        document.getElementById('modal-titulo').innerText = datos.termino || '';
+        document.getElementById('modal-descripcion-texto').innerHTML = renderTips(datos.definicion, datos.glosario_tips);
+        document.getElementById('modal-caso-practico').innerHTML = datos.caso || '';
+        document.getElementById('modal-abstraccion-conclusión').innerHTML = datos.conclusion || '';
+    } else {
+        document.getElementById('modal-titulo').innerText = datos.titulo;
+        document.getElementById('modal-descripcion-texto').innerHTML = datos.concepto;
+        document.getElementById('modal-caso-practico').innerHTML = datos.caso;
+        document.getElementById('modal-abstraccion-conclusión').innerHTML = datos.conclusion;
+    }
 
     const sub = document.getElementById('modal-subtitulo');
     const tema = document.getElementById('modal-tema-nombre');
@@ -553,3 +651,15 @@ if (modalElemento) {
         if (clicFuera) this.close();
     });
 }
+
+// ── CERRAR SESIÓN ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const btnCerrar = document.getElementById('btn-cerrar-sesion');
+    if (!btnCerrar) return;
+    btnCerrar.addEventListener('click', () => {
+        if (window.ApiClient && window.ApiClient.cerrarSesion) {
+            window.ApiClient.cerrarSesion();
+        }
+        window.location.href = './Inicio/inicio.html';
+    });
+});

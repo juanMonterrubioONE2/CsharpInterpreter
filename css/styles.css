@@ -41,7 +41,33 @@ header {
 .app-header {
     background-color: var(--dark);
     padding: 6px 20px;
-    /* antes 12px 20px → menos alto */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-cerrar-header {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    color: #bfc6d1;
+    padding: 5px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.btn-cerrar-header:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+}
+.btn-cerrar-header img {
+    width: 18px;
+    height: 18px;
+    opacity: 0.75;
 }
 
 .logo {
