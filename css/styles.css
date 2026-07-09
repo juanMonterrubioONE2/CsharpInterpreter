@@ -1565,6 +1565,16 @@ pre {
     background: rgba(112, 38, 176, 0.156);
 }
 
+.sim-api-error {
+    background: rgba(224, 82, 99, 0.12);
+    border: 1px solid #e05263;
+    border-radius: 6px;
+    color: #e05263;
+    font-size: 0.82rem;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+}
+
 .sim-ejercicio-badge {
     display: inline-block;
     color: #fff;

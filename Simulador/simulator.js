@@ -1689,14 +1689,96 @@ function simSetDescripcion(html, esEjercicio) {
     }
 }
 
-function initSimulador(tema) {
+// ── Conexión con la API (carga ejemplos/ejercicios del servidor) ──
+const simCacheSubtemas = {};
+
+function simMostrarErrorApi(mensaje) {
+    const editorBody = document.getElementById('editor-body');
+    if (!editorBody) return;
+    let box = document.getElementById('sim-api-error');
+    if (!mensaje) { if (box) box.remove(); return; }
+    if (!box) {
+        box = document.createElement('div');
+        box.id = 'sim-api-error';
+        box.className = 'sim-api-error';
+        editorBody.parentNode.insertBefore(box, editorBody);
+    }
+    box.textContent = mensaje;
+}
+
+async function simObtenerDatosTema(slug) {
+    if (simCacheSubtemas[slug]) return simCacheSubtemas[slug];
+    try {
+        if (!window.ApiClient || typeof window.ApiClient.obtenerSubtemaPorSlug !== 'function') {
+            throw new Error('ApiClient no disponible');
+        }
+        const subtema = await window.ApiClient.obtenerSubtemaPorSlug(slug);
+        if (!subtema) throw new Error('La API devolvió respuesta vacía para "' + slug + '"');
+        simCacheSubtemas[slug] = subtema;
+        return subtema;
+    } catch (e) {
+        console.warn('Subtema "' + slug + '" no encontrado en API, usando datos locales', e);
+        return {
+            definicion: (window.temas && window.temas[slug]) ? window.temas[slug].definicion : '',
+            codigo_ejemplo: null,
+            _apiError: e.message
+        };
+    }
+}
+
+function simNormalizarCodigoEjemplo(codigo_ejemplo) {
+    if (typeof codigo_ejemplo === 'string') return { ejemplos: [codigo_ejemplo], ejercicio: null };
+    if (Array.isArray(codigo_ejemplo)) return { ejemplos: codigo_ejemplo, ejercicio: null };
+    if (codigo_ejemplo && typeof codigo_ejemplo === 'object') {
+        return {
+            ejemplos: Array.isArray(codigo_ejemplo.ejemplos) ? codigo_ejemplo.ejemplos : [],
+            ejercicio: codigo_ejemplo.ejercicio || null
+        };
+    }
+    return { ejemplos: [''], ejercicio: null };
+}
+
+function simGetItemsDesdeSubtema(subtema, slugFallback) {
+    if (subtema.codigo_ejemplo === null) {
+        return simGetItems(slugFallback);
+    }
+    const { ejemplos } = simNormalizarCodigoEjemplo(subtema.codigo_ejemplo);
+    const items = ejemplos.map((code, i) => ({
+        label: ejemplos.length > 1 ? 'Ejemplo ' + (i + 1) : 'Ejemplo',
+        codigo: code,
+        enunciado: null
+    }));
+    const ej = (Array.isArray(subtema.ejercicios) && subtema.ejercicios.length) ? subtema.ejercicios[0] : null;
+    if (ej) {
+        items.push({
+            label: 'Ejercicio',
+            codigo: ej.codigo_csharp,
+            enunciado: ej.descripcion,
+            esEjercicio: true
+        });
+    }
+    if (!items.length) items.push({ label: 'Ejemplo 1', codigo: '// La API no devolvió ejemplos para este tema.', enunciado: null });
+    return items;
+}
+
+async function initSimulador(tema) {
     const editorBody = document.getElementById('editor-body');
     if (!editorBody) return;
     simTemaActual = tema;
 
-    const items = simGetItems(tema);
-    const codigo = items[0].codigo;
-    const defOriginal = (window.temas && window.temas[tema]) ? window.temas[tema].definicion : '';
+    let subtema, items, codigo, defOriginal;
+    try {
+        subtema = await simObtenerDatosTema(tema);
+        items = simGetItemsDesdeSubtema(subtema, tema);
+        codigo = items[0].codigo;
+        defOriginal = subtema.definicion || ((window.temas && window.temas[tema]) ? window.temas[tema].definicion : '');
+        if (subtema._apiError) simMostrarErrorApi('Sin conexión con la API. Mostrando datos locales.');
+        else simMostrarErrorApi(null);
+    } catch (e) {
+        console.error('Error inicializando simulador para "' + tema + '":', e);
+        simMostrarErrorApi('Error cargando el simulador: ' + e.message);
+        return;
+    }
 
     // Pestañas (solo si hay más de un item)
     if (!document.getElementById('sim-ejemplos-tabs') && items.length > 1) {
@@ -1865,7 +1947,7 @@ function conectarBotones() {
         if (typeof _cargarTema === 'function') _cargarTema(nombreTema);
 
         if (TEMAS_SOPORTADOS.includes(nombreTema)) {
-            setTimeout(() => initSimulador(nombreTema), 0);
+            initSimulador(nombreTema); // async, no necesita setTimeout
         }
     };
 })();
