@@ -755,6 +755,61 @@ string resultado = (edad >= 18) ? "Es mayor de edad" : "Es menor de edad";
 
 Console.WriteLine(resultado);`,
 
+    // ── Operadores ───────────────────────────────────────────
+    operadores_logicos:
+        `bool tieneCuenta = true;
+bool mayorDeEdad = false;
+
+// && exige que ambas sean verdaderas
+if (tieneCuenta && mayorDeEdad) {
+    Console.WriteLine("Puede acceder");
+} else {
+    Console.WriteLine("Acceso denegado");
+}
+
+// || basta con que una sea verdadera
+if (tieneCuenta || mayorDeEdad) {
+    Console.WriteLine("Al menos una condición se cumple");
+}
+
+// ! invierte el valor
+if (!mayorDeEdad) {
+    Console.WriteLine("Es menor de edad");
+}`,
+
+    operadores_aritmeticos:
+        `int a = 15;
+int b = 4;
+
+int suma = a + b;
+int resta = a - b;
+int producto = a * b;
+int division = a / b;
+int residuo = a % b;
+
+Console.WriteLine("Suma: " + suma);
+Console.WriteLine("Resta: " + resta);
+Console.WriteLine("Producto: " + producto);
+Console.WriteLine("División entera: " + division);
+Console.WriteLine("Residuo: " + residuo);`,
+
+    operadores_relacionales:
+        `int edad = 17;
+int limite = 18;
+
+Console.WriteLine(edad > limite);
+Console.WriteLine(edad < limite);
+Console.WriteLine(edad >= limite);
+Console.WriteLine(edad <= limite);
+Console.WriteLine(edad == limite);
+Console.WriteLine(edad != limite);
+
+if (edad >= limite) {
+    Console.WriteLine("Mayor o igual al límite");
+} else {
+    Console.WriteLine("Por debajo del límite");
+}`,
+
     Ciclos_for:
         `int suma = 0;
 
@@ -1106,6 +1161,54 @@ Console.WriteLine(beca);`
 // ════════════════════════════════════════════════════════════
 const EJERCICIOS = {
 
+    // ══ CICLOS ═════════════════════════════════════════════
+    Ciclos_for: {
+        enunciado: "Un maestro quiere saber cuántos de sus 5 alumnos aprobaron el examen. Cada alumno tiene una calificación diferente. Usa un ciclo for para recorrer todas las calificaciones, comparar cada una con el mínimo aprobatorio (6) y llevar la cuenta de cuántos aprobaron. Al terminar el ciclo, muestra el total de alumnos aprobados.",
+        codigo:
+            `int aprobados = 0;
+int calificacion;
+
+for (int alumno = 1; alumno <= 5; alumno = alumno + 1) {
+    if (alumno == 1) calificacion = 8;
+    else if (alumno == 2) calificacion = 4;
+    else if (alumno == 3) calificacion = 9;
+    else if (alumno == 4) calificacion = 5;
+    else calificacion = 7;
+
+    if (calificacion >= 6) {
+        aprobados = aprobados + 1;
+    }
+    Console.WriteLine("Alumno " + alumno + ": " + calificacion);
+}
+
+Console.WriteLine("Aprobados: " + aprobados);`
+    },
+
+    // ══ OPERADORES ═════════════════════════════════════════
+    operadores_logicos: {
+        enunciado: "Un sistema de seguridad en una biblioteca digital verifica dos condiciones antes de dejar entrar a un usuario: que tenga una cuenta activa (bool) y que tenga al menos 13 años de edad. Solo si ambas condiciones son verdaderas al mismo tiempo se le permite el acceso. Además, si el usuario es mayor de 18 años o tiene membresía premium, puede acceder a contenido exclusivo. Escribe el programa que evalúe estas condiciones y muestre los mensajes correspondientes.",
+        codigo:
+            `bool cuentaActiva = true;
+int edad = 15;
+bool membresiaPremium = false;
+
+if (cuentaActiva && edad >= 13) {
+    Console.WriteLine("Acceso a la biblioteca permitido");
+} else {
+    Console.WriteLine("Acceso denegado");
+}
+
+if (edad >= 18 || membresiaPremium) {
+    Console.WriteLine("Acceso a contenido exclusivo permitido");
+} else {
+    Console.WriteLine("Sin acceso a contenido exclusivo");
+}
+
+if (!cuentaActiva) {
+    Console.WriteLine("Por favor crea una cuenta");
+}`
+    },
+
     // ══ SIMPLES ════════════════════════════════════════════
     if_simple: {
         enunciado: "Una tienda en línea quiere premiar a los clientes que gastan más. La regla es sencilla: cuando el total de la compra supera los $500, el envío corre por cuenta de la tienda; en caso contrario, el cliente debe pagar un costo fijo de envío. Tu tarea es tomar el total de la compra, compararlo con ese límite y mostrar en pantalla el mensaje adecuado según si el envío es gratis o tiene costo.",
@@ -1252,7 +1355,8 @@ const TEMAS_SOPORTADOS = [
     'Ciclos_for', 'Ciclos_while', 'Ciclos_dowhile',
     'if_simple', 'switch_simple', 'ternario_simple',
     'if_anidada', 'switch_anidada', 'ternario_anidada',
-    'if_compuesta', 'switch_compuesta', 'ternario_compuesta'
+    'if_compuesta', 'switch_compuesta', 'ternario_compuesta',
+    'operadores_logicos', 'operadores_aritmeticos', 'operadores_relacionales'
 ];
 const sim = new Simulador();
 let simEditor = null;
