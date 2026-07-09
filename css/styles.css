@@ -1910,3 +1910,29 @@ pre {
 .arr-var-input:focus {
     border-color: #04AA6D;
 }
+/* ── Tabla de métodos del módulo Archivos ── */
+.arc-tabla-metodos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82em;
+    margin-top: 6px;
+}
+.arc-tabla-metodos th {
+    background: #1e2130;
+    color: #8a9ab5;
+    font-weight: 600;
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid #3a3d4a;
+}
+.arc-tabla-metodos td {
+    padding: 5px 10px;
+    border-bottom: 1px solid #2a2d3a;
+    vertical-align: top;
+}
+.arc-tabla-metodos tr:last-child td { border-bottom: none; }
+.arc-tabla-metodos code {
+    font-family: 'Consolas', monospace;
+    font-size: 0.9em;
+    color: #04AA6D;
+}
